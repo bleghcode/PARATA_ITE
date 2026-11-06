@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -122,7 +122,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 <div class="wrap">
   <header class="top">
     <div class="brand"><i></i>Itinerary Desk</div>
-    <nav class="tabs" id="nav" aria-label="เมนูหลัก"></nav>
+    <nav class="tabs" id="nav" aria-label="Main menu"></nav>
   </header>
   <div id="banner"></div>
   <main id="main"></main>
@@ -136,19 +136,22 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 
 var CO_DEFAULT={brand:'Your Brand',name:'Your Company Co Ltd.',address:'',phones:'',email:'',location:'',regNo:''};
-var TOUR_CATS=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Transfer','รถรับส่ง'],['Other','อื่น ๆ']];
-var CITIES=[['Bangkok','Bangkok'],['Pattaya','Pattaya'],['Other','อื่น ๆ']];
-var SNIP_KINDS=[['hotelCond','เงื่อนไขโรงแรม'],['meals','มื้ออาหาร'],['terms','Terms & Conditions'],['other','อื่น ๆ']];
+var TOUR_CATS=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Transfer','Transfer'],['Other','Other']];
+var CITIES=[['Bangkok','Bangkok'],['Pattaya','Pattaya'],['Other','Other']];
+var SNIP_KINDS=[['hotelCond','Hotel conditions'],['meals','Meals'],['terms','Terms & Conditions'],['other','Other']];
 var LIBS={
-  tours:{title:'คลังทัวร์และกิจกรรม',hint:'รายการที่เลือกใส่ในแต่ละวันของใบ Itinerary',add:'เพิ่มรายการ',
-    fields:[['name','ชื่อรายการ (ข้อความที่แสดงในใบ)','text'],['cat','หมวด','select',TOUR_CATS],['note','ข้อความต่อท้าย เช่น ข้อกำหนดเพิ่มเติม','textarea']]},
-  hotels:{title:'โรงแรม',hint:'ใช้เป็นตัวเลือกเมื่อกรอกโรงแรมในใบ',add:'เพิ่มโรงแรม',
-    fields:[['name','ชื่อโรงแรม','text'],['city','เมือง','select',CITIES]]},
-  snippets:{title:'ข้อความมาตรฐาน',hint:'เงื่อนไขโรงแรม มื้ออาหาร และ Terms ที่ใช้ซ้ำทุกใบ',add:'เพิ่มข้อความ',
-    fields:[['title','ชื่อข้อความ','text'],['kind','ประเภท','select',SNIP_KINDS],['body','เนื้อหา','textarea']]}
+  tours:{title:'Tours & activities',hint:'Items you can add to each day of an itinerary',add:'Add item',
+    fields:[['name','Item name (shown on the itinerary)','text'],['cat','Category','select',TOUR_CATS],['note','Extra text after the name (optional)','textarea']]},
+  hotels:{title:'Hotels',hint:'Suggestions when entering hotels on an itinerary',add:'Add hotel',
+    fields:[['name','Hotel name','text'],['city','City','select',CITIES]]},
+  snippets:{title:'Standard text',hint:'Hotel conditions, meals and terms reused on every itinerary',add:'Add text',
+    fields:[['title','Title','text'],['kind','Type','select',SNIP_KINDS],['body','Content','textarea']]}
 };
-var NAV=[['list','ใบ Itinerary'],['tours','ทัวร์/กิจกรรม'],['hotels','โรงแรม'],['snippets','ข้อความมาตรฐาน']];
+var NAV=[['list','Itineraries'],['tours','Tours'],['hotels','Hotels'],['snippets','Standard text']];
 var KINDS=['tours','hotels','snippets','itineraries'];
+// Options for the Transport dropdowns. Edit these two lists to change the choices.
+var ROUTES=['Bangkok to Pattaya Transport by','Pattaya to Bangkok Transport by','Bangkok Airport Drop-off by','Other Tours Travel by'];
+var VEHICLES=['Car','6 Seater','9 Seater','12 Seater','Bus'];
 
 var S={tours:[],hotels:[],snippets:[],itineraries:[],company:null,loaded:{},view:'list',editId:null,draft:null,
   saving:false,libEdit:null,delArmed:false,q:'',err:''};
@@ -167,11 +170,11 @@ function byName(a,b){return String(a.name||a.title||'').localeCompare(String(b.n
 
 function newDraft(){
   var pick=function(k){var s=S.snippets.filter(function(x){return x.kind===k})[0];return s?s.body:''};
-  return {number:nextNumber(),issueDate:today(),guestName:'',arrival:'',departure:'',adults:2,
+  return {number:nextNumber(),issueDate:today(),guestName:'',arrival:'',departure:'',adults:'',
     days:[{text:''}],
-    transport:[{k:'Bangkok to Pattaya Transport by',v:'6 Seater'},{k:'Pattaya to Bangkok Transport by',v:'6 Seater'},{k:'Bangkok Airport Drop-off by',v:'6 Seater'},{k:'Other Tours Travel by',v:'Car'}],
-    hotels:[{k:'Bangkok',v:''},{k:'Pattaya',v:''}],
-    hotelCond:pick('hotelCond'),meals:pick('meals'),sim:'1 Sim',agent:'',terms:pick('terms')};
+    transport:[],
+    hotels:[],
+    hotelCond:pick('hotelCond'),meals:pick('meals'),sim:'',agent:'',terms:pick('terms')};
 }
 
 /* ---------- document (preview, download, text) ---------- */
@@ -225,7 +228,7 @@ function loadKind(k){
 }
 function loadAll(){return Promise.all(KINDS.map(loadKind))}
 function renderBanner(){
-  $('#banner').innerHTML=S.err?'<div class="banner">เชื่อมต่อ Notion ไม่สำเร็จ: '+esc(S.err)+'</div>':'';
+  $('#banner').innerHTML=S.err?'<div class="banner">Could not reach Notion: '+esc(S.err)+'</div>':'';
 }
 
 /* ---------- views ---------- */
@@ -249,26 +252,26 @@ function onData(){var v=VIEWS[S.view];if(v&&v.refresh)v.refresh()}
 
 VIEWS.list={
   mount:function(){
-    main().innerHTML='<div class="head"><h1>ใบ Itinerary</h1><div class="actions"><input id="q" type="search" placeholder="ค้นหาชื่อแขกหรือเลขที่" value="'+esc(S.q)+'"><button class="btn primary" data-act="new">+ สร้างใบใหม่</button></div></div><div id="rows"></div>';
+    main().innerHTML='<div class="head"><h1>Itineraries</h1><div class="actions"><input id="q" type="search" placeholder="Search by guest name or number" value="'+esc(S.q)+'"><button class="btn primary" data-act="new">+ New itinerary</button></div></div><div id="rows"></div>';
     this.refresh();
   },
   refresh:function(){
     var r=$('#rows');if(!r)return;
-    if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'โหลดข้อมูลไม่สำเร็จ':'กำลังโหลดข้อมูล')+'</div>';return}
+    if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
     var q=S.q.trim().toLowerCase();
     var list=S.itineraries.slice().sort(function(a,b){return (+b.number||0)-(+a.number||0)}).filter(function(i){
       return !q||String(i.number).indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
     if(!list.length){
-      r.innerHTML=S.itineraries.length?'<div class="empty">ไม่พบใบที่ตรงกับคำค้นหา</div>':
-        '<div class="empty"><h2>ยังไม่มีใบ Itinerary</h2><p>กด “สร้างใบใหม่” เพื่อเริ่มใบแรก ใบที่บันทึกจะเก็บใน Notion และเปิดแก้ไขหรือทำสำเนาได้</p></div>';
+      r.innerHTML=S.itineraries.length?'<div class="empty">No itineraries match your search</div>':
+        '<div class="empty"><h2>No itineraries yet</h2><p>Click “New itinerary” to create the first one. Saved itineraries are stored in Notion and can be reopened, edited or duplicated.</p></div>';
       return;
     }
     r.innerHTML=list.map(function(i){
-      return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(ไม่ระบุชื่อ)')+'</b>'+
-        '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · ผู้ใหญ่ '+esc(i.adults)+' คน · '+esc(i.days)+' วัน</div>'+
+      return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
+        '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · '+esc(i.adults)+' adults · '+esc(i.days)+' days</div>'+
         (i.hotelsText?'<div class="sub">'+esc(i.hotelsText)+'</div>':'')+'</div>'+
-        '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">เปิด</button>'+
-        '<button class="btn small" data-act="dup" data-id="'+esc(i.id)+'">ทำสำเนา</button></div></div>';
+        '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">Open</button>'+
+        '<button class="btn small" data-act="dup" data-id="'+esc(i.id)+'">Duplicate</button></div></div>';
     }).join('');
   }
 };
@@ -278,29 +281,34 @@ function tourOptions(){
     var items=S.tours.filter(function(t){return (t.cat||'Other')===c[0]}).sort(byName);
     return items.length?'<optgroup label="'+esc(c[1])+'">'+items.map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>'}).join('')+'</optgroup>':'';
   }).join('');
-  return '<option value="">เลือกจากคลังทัวร์</option>'+cats;
+  return '<option value="">Choose a tour</option>'+cats;
 }
 function snipSelect(field,kind){
   var items=S.snippets.filter(function(s){return s.kind===kind});
   if(!items.length)return '';
-  return '<select data-snip="'+field+'" aria-label="ใส่ข้อความมาตรฐาน"><option value="">ใส่ข้อความมาตรฐาน</option>'+items.map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.title)+'</option>'}).join('')+'</select>';
+  return '<select data-snip="'+field+'" aria-label="Insert standard text"><option value="">Insert standard text</option>'+items.map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.title)+'</option>'}).join('')+'</select>';
 }
 function daysHTML(){
   var opts=tourOptions();
   return S.draft.days.map(function(d,i){
-    return '<div class="day"><div class="day-head"><b>Day '+(i+1)+'</b><select data-tour="'+i+'" aria-label="เลือกทัวร์ Day '+(i+1)+'">'+opts+'</select>'+
-      '<button class="btn small" data-act="addTour" data-i="'+i+'">เพิ่ม</button>'+
-      (S.draft.days.length>1?'<button class="btn small danger" data-act="rmDay" data-i="'+i+'" aria-label="ลบ Day '+(i+1)+'">ลบ</button>':'')+'</div>'+
-      '<textarea id="day-'+i+'" data-day="'+i+'" rows="5" placeholder="หนึ่งบรรทัดต่อหนึ่งรายการ">'+esc(d.text)+'</textarea></div>';
+    return '<div class="day"><div class="day-head"><b>Day '+(i+1)+'</b><select data-tour="'+i+'" aria-label="Choose tour for Day '+(i+1)+'">'+opts+'</select>'+
+      '<button class="btn small" data-act="addTour" data-i="'+i+'">Add</button>'+
+      (S.draft.days.length>1?'<button class="btn small danger" data-act="rmDay" data-i="'+i+'" aria-label="Remove Day '+(i+1)+'">Remove</button>':'')+'</div>'+
+      '<textarea id="day-'+i+'" data-day="'+i+'" rows="5" placeholder="One item per line">'+esc(d.text)+'</textarea></div>';
   }).join('');
+}
+function selHTML(attrs,list,cur,ph){
+  var opts=list.slice();if(cur&&opts.indexOf(cur)<0)opts.unshift(cur);
+  return '<select '+attrs+'><option value="">'+ph+'</option>'+opts.map(function(o){return '<option'+(o===cur?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select>';
 }
 function pairsHTML(key){
   var hot=key==='hotels';
+  if(!S.draft[key].length)return '<div class="sub">'+(hot?'No hotels added yet.':'No transport added yet.')+'</div>';
   return S.draft[key].map(function(p,i){
-    var ph1=hot?'เมือง':'หัวข้อ',ph2=hot?'ชื่อโรงแรม':'ประเภทรถ';
-    return '<div class="pair'+(hot?' short':'')+'"><input data-pair="'+key+'" data-i="'+i+'" data-k="k" value="'+esc(p.k)+'" placeholder="'+ph1+'" aria-label="'+ph1+'">'+
-      '<input data-pair="'+key+'" data-i="'+i+'" data-k="v" value="'+esc(p.v)+'" placeholder="'+ph2+'" aria-label="'+ph2+'"'+(hot?' list="hotelNames"':'')+'>'+
-      '<button class="btn small danger" data-act="rmPair" data-key="'+key+'" data-i="'+i+'" aria-label="ลบแถว">ลบ</button></div>';
+    var base='data-pair="'+key+'" data-i="'+i+'"';
+    var f1=hot?'<input '+base+' data-k="k" value="'+esc(p.k)+'" placeholder="City" aria-label="City">':selHTML(base+' data-k="k" aria-label="Route"',ROUTES,p.k,'Select route');
+    var f2=hot?'<input '+base+' data-k="v" value="'+esc(p.v)+'" placeholder="Hotel name" aria-label="Hotel name" list="hotelNames">':selHTML(base+' data-k="v" aria-label="Vehicle"',VEHICLES,p.v,'Select vehicle');
+    return '<div class="pair'+(hot?' short':'')+'">'+f1+f2+'<button class="btn small danger" data-act="rmPair" data-key="'+key+'" data-i="'+i+'" aria-label="Remove row">Remove</button></div>';
   }).join('');
 }
 function fld(label,id,f,type,extra){
@@ -314,23 +322,23 @@ VIEWS.editor={
     var d=S.draft;if(!d){go('list');return}
     var hotelNames=S.hotels.slice().sort(byName).map(function(h){return '<option value="'+esc(h.name)+'">'}).join('');
     main().innerHTML=
-     '<div class="head"><h1>'+(S.editId?'แก้ไขใบเลขที่ '+esc(d.number):'ใบ Itinerary ใหม่')+'</h1><div class="actions">'+
-       '<button class="btn" data-act="back">กลับ</button>'+
-       '<button class="btn" data-act="print">พิมพ์ / บันทึกเป็น PDF</button>'+
-       '<button class="btn" data-act="download">ดาวน์โหลด .html</button>'+
-       '<button class="btn" data-act="copy">คัดลอกเป็นข้อความ</button>'+
-       (S.editId?'<button class="btn danger" data-act="delete">ลบใบนี้</button>':'')+
-       '<button class="btn primary" data-act="save">บันทึก</button></div></div>'+
+     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(d.number):'New itinerary')+'</h1><div class="actions">'+
+       '<button class="btn" data-act="back">Back</button>'+
+       '<button class="btn" data-act="print">Print / Save as PDF</button>'+
+       '<button class="btn" data-act="download">Download .html</button>'+
+       '<button class="btn" data-act="copy">Copy as text</button>'+
+       (S.editId?'<button class="btn danger" data-act="delete">Delete itinerary</button>':'')+
+       '<button class="btn primary" data-act="save">Save</button></div></div>'+
      '<datalist id="hotelNames">'+hotelNames+'</datalist>'+
      '<div class="split"><div class="stack" id="form">'+
-       '<section class="card stack"><h2>ข้อมูลแขก</h2><div class="grid2">'+fld('เลขที่ใบ','f-number','number','number')+fld('วันที่ออกใบ','f-issue','issueDate','date')+'</div>'+
-         fld('ชื่อแขก','f-guest','guestName')+
-         '<div class="grid3">'+fld('วันเดินทางมา','f-arr','arrival','date')+fld('วันเดินทางกลับ','f-dep','departure','date')+fld('ผู้ใหญ่ (>120 ซม.)','f-adults','adults','number','min="1"')+'</div></section>'+
-       '<section class="card stack"><div class="head" style="margin:0"><h2>โปรแกรมรายวัน</h2><button class="btn small" data-act="genDays">สร้างจำนวนวันตามวันที่</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ เพิ่มวัน</button></div></section>'+
-       '<section class="card stack"><h2>รถรับส่ง</h2><div id="transport">'+pairsHTML('transport')+'</div><div><button class="btn small" data-act="addPair" data-key="transport">+ เพิ่มแถว</button></div></section>'+
-       '<section class="card stack"><h2>โรงแรม</h2><div id="hotels">'+pairsHTML('hotels')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ เพิ่มโรงแรม</button></div>'+
-         area('เงื่อนไขการจองโรงแรม','f-hc','hotelCond','hotelCond',6)+'</section>'+
-       '<section class="card stack"><h2>มื้ออาหารและอื่น ๆ</h2>'+area('Meals','f-meals','meals','meals',4)+
+       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','number')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
+         fld('Guest name','f-guest','guestName')+
+         '<div class="grid3">'+fld('Arrival date','f-arr','arrival','date')+fld('Departure date','f-dep','departure','date')+fld('Adults (>120 cm)','f-adults','adults','number','min="1"')+'</div></section>'+
+       '<section class="card stack"><div class="head" style="margin:0"><h2>Daily program</h2><button class="btn small" data-act="genDays">Set days from dates</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ Add day</button></div></section>'+
+       '<section class="card stack"><h2>Transport</h2><div id="transport">'+pairsHTML('transport')+'</div><div><button class="btn small" data-act="addPair" data-key="transport">+ Add transport</button></div></section>'+
+       '<section class="card stack"><h2>Hotels</h2><div id="hotels">'+pairsHTML('hotels')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ Add hotel</button></div>'+
+         area('Hotel booking conditions','f-hc','hotelCond','hotelCond',6)+'</section>'+
+       '<section class="card stack"><h2>Meals & other</h2>'+area('Meals','f-meals','meals','meals',4)+
          '<div class="grid2">'+fld('Free Thailand Data Sim Cards','f-sim','sim')+fld('Booking Agent','f-agent','agent')+'</div>'+
          area('Terms & Conditions','f-terms','terms','terms',5)+'</section>'+
      '</div><div class="preview-col"><div class="scroll-x" id="preview"></div></div></div>';
@@ -343,7 +351,7 @@ VIEWS.editor={
 function libSummary(kind,it){
   if(kind==='tours')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.cat||'Other')+'</span>'+esc(it.note||'')+'</div>';
   if(kind==='hotels')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.city||'Other')+'</span></div>';
-  var kl=(SNIP_KINDS.filter(function(k){return k[0]===it.kind})[0]||[0,'อื่น ๆ'])[1];
+  var kl=(SNIP_KINDS.filter(function(k){return k[0]===it.kind})[0]||[0,'Other'])[1];
   return '<b>'+esc(it.title)+'</b><div class="sub"><span class="chip">'+esc(kl)+'</span>'+esc(String(it.body||'').slice(0,110))+(String(it.body||'').length>110?'…':'')+'</div>';
 }
 function makeLib(kind){
@@ -357,17 +365,17 @@ function makeLib(kind){
         return '<div><label for="'+id+'">'+f[1]+'</label><input id="'+id+'"></div>';
       }).join('');
       main().innerHTML='<div class="head"><div><h1>'+esc(L.title)+'</h1><div class="sub">'+esc(L.hint)+'</div></div></div>'+
-        '<section class="card stack" style="margin-bottom:16px"><h2 id="lib-form-title">'+esc(L.add)+'</h2>'+form+'<div class="actions"><button class="btn primary" data-act="libSave">บันทึก</button><button class="btn" data-act="libCancel" id="libCancel" hidden>ยกเลิกการแก้ไข</button></div></section>'+
+        '<section class="card stack" style="margin-bottom:16px"><h2 id="lib-form-title">'+esc(L.add)+'</h2>'+form+'<div class="actions"><button class="btn primary" data-act="libSave">Save</button><button class="btn" data-act="libCancel" id="libCancel" hidden>Cancel edit</button></div></section>'+
         '<div class="lib-list" id="lib"></div>';
       this.refresh();
     },
     refresh:function(){
       var r=$('#lib');if(!r)return;
-      if(!S.loaded[kind]){r.innerHTML='<div class="empty">'+(S.err?'โหลดข้อมูลไม่สำเร็จ':'กำลังโหลดข้อมูล')+'</div>';return}
+      if(!S.loaded[kind]){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
       var list=S[kind].slice().sort(byName);
-      if(!list.length){r.innerHTML='<div class="empty"><h2>ยังไม่มีรายการ</h2><p>เพิ่มรายการแรกจากฟอร์มด้านบน</p></div>';return}
+      if(!list.length){r.innerHTML='<div class="empty"><h2>No items yet</h2><p>Add the first one using the form above.</p></div>';return}
       r.innerHTML=list.map(function(it){
-        return '<div class="row-card"><div style="min-width:0" class="pre">'+libSummary(kind,it)+'</div><div class="actions"><button class="btn small" data-act="libEdit" data-id="'+esc(it.id)+'">แก้ไข</button><button class="btn small danger" data-act="libDel" data-id="'+esc(it.id)+'">ลบ</button></div></div>';
+        return '<div class="row-card"><div style="min-width:0" class="pre">'+libSummary(kind,it)+'</div><div class="actions"><button class="btn small" data-act="libEdit" data-id="'+esc(it.id)+'">Edit</button><button class="btn small danger" data-act="libDel" data-id="'+esc(it.id)+'">Delete</button></div></div>';
       }).join('');
     }
   };
@@ -377,12 +385,12 @@ VIEWS.tours=makeLib('tours');VIEWS.hotels=makeLib('hotels');VIEWS.snippets=makeL
 /* ---------- actions ---------- */
 function guard(fn){
   if(S.saving)return;S.saving=true;
-  Promise.resolve().then(fn).catch(function(e){toast('ไม่สำเร็จ: '+(e&&e.message||'ลองอีกครั้ง'))}).then(function(){S.saving=false});
+  Promise.resolve().then(fn).catch(function(e){toast('Failed: '+(e&&e.message||'please try again'))}).then(function(){S.saving=false});
 }
 function openDraft(d,id){S.draft=d;S.editId=id||null;S.delArmed=false;S.view='editor';render();window.scrollTo(0,0)}
 function genDays(){
   var a=parseD(S.draft.arrival),b=parseD(S.draft.departure);
-  if(!a||!b||b<a){toast('กรอกวันเดินทางมาและวันกลับให้ถูกต้องก่อน');return}
+  if(!a||!b||b<a){toast('Enter valid arrival and departure dates first');return}
   var n=Math.min(Math.round((b-a)/864e5)+1,30);
   while(S.draft.days.length<n)S.draft.days.push({text:''});
   S.draft.days.length=Math.max(n,1);
@@ -403,7 +411,7 @@ document.addEventListener('click',function(e){
   else if(a==='genDays'){genDays()}
   else if(a==='addTour'){
     var sel=$('[data-tour="'+i+'"]');var t=S.tours.filter(function(x){return x.id===(sel&&sel.value)})[0];
-    if(!t){toast('เลือกรายการจากคลังทัวร์ก่อน');return}
+    if(!t){toast('Choose a tour first');return}
     var line=t.name+(t.note?' '+t.note:'');var cur=S.draft.days[i].text.replace(/\s+$/,'');
     S.draft.days[i].text=(cur?cur+'\n':'')+line;$('#days').innerHTML=daysHTML();VIEWS.editor.preview();
   }
@@ -413,15 +421,15 @@ document.addEventListener('click',function(e){
     var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;
     var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id});
     return req.then(function(){
-      toast('บันทึกลง Notion แล้ว');
-      var h=$('.head h1');if(h)h.textContent='แก้ไขใบเลขที่ '+d.number;
-      var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='ลบใบนี้';act.insertBefore(nb,pr)}
+      toast('Saved to Notion');
+      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+d.number;
+      var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='Delete itinerary';act.insertBefore(nb,pr)}
       loadKind('itineraries');
     });
   })}
   else if(a==='delete'){
-    if(!S.delArmed){S.delArmed=true;b.textContent='กดอีกครั้งเพื่อยืนยันลบ';setTimeout(function(){S.delArmed=false;if(b.isConnected)b.textContent='ลบใบนี้'},4000)}
-    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('ลบแล้ว');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list')})})
+    if(!S.delArmed){S.delArmed=true;b.textContent='Click again to confirm';setTimeout(function(){S.delArmed=false;if(b.isConnected)b.textContent='Delete itinerary'},4000)}
+    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('Deleted');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list')})})
   }
   else if(a==='print'){window.print()}
   else if(a==='download'){
@@ -432,31 +440,31 @@ document.addEventListener('click',function(e){
   }
   else if(a==='copy'){
     var txt=textExport(S.draft,company());
-    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast('คัดลอกแล้ว วางในแชทได้เลย')}).catch(function(){toast('คัดลอกไม่ได้ ใช้ปุ่มดาวน์โหลดแทน')});
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast('Copied. Paste it into your chat.')}).catch(function(){toast('Could not copy. Use Download instead.')});
   }
   else if(a==='libSave'){guard(function(){
     var kind=S.view,L=LIBS[kind],data={};
     L.fields.forEach(function(f){data[f[0]]=$('#lf-'+f[0]).value.trim()});
-    if(!data[L.fields[0][0]]){toast('กรอกชื่อก่อนบันทึก');return}
+    if(!data[L.fields[0][0]]){toast('Enter a name first');return}
     var base='/api/lib/'+kind;
     var req=S.libEdit?api('PUT',base+'/'+S.libEdit,data):api('POST',base,data);
     return req.then(function(){
       S.libEdit=null;L.fields.forEach(function(f){var el=$('#lf-'+f[0]);if(f[2]!=='select')el.value=''});
-      $('#libCancel').hidden=true;$('#lib-form-title').textContent=L.add;toast('บันทึกลง Notion แล้ว');
+      $('#libCancel').hidden=true;$('#lib-form-title').textContent=L.add;toast('Saved to Notion');
       return loadKind(kind);
     });
   })}
   else if(a==='libEdit'){
     var kind2=S.view,it2=S[kind2].filter(function(x){return x.id===id})[0];if(!it2)return;
     S.libEdit=id;LIBS[kind2].fields.forEach(function(f){$('#lf-'+f[0]).value=it2[f[0]]||''});
-    $('#libCancel').hidden=false;$('#lib-form-title').textContent='แก้ไขรายการ';$('#lf-'+LIBS[kind2].fields[0][0]).focus();
+    $('#libCancel').hidden=false;$('#lib-form-title').textContent='Edit item';$('#lf-'+LIBS[kind2].fields[0][0]).focus();
   }
   else if(a==='libCancel'){
     var L2=LIBS[S.view];S.libEdit=null;L2.fields.forEach(function(f){if(f[2]!=='select')$('#lf-'+f[0]).value=''});$('#libCancel').hidden=true;$('#lib-form-title').textContent=L2.add;
   }
   else if(a==='libDel'){
-    if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='ยืนยันลบ';setTimeout(function(){if(b.isConnected){b.removeAttribute('data-armed');b.textContent='ลบ'}},4000)}
-    else guard(function(){var kind=S.view;return api('DELETE','/api/lib/'+kind+'/'+id).then(function(){toast('ลบแล้ว');return loadKind(kind)})});
+    if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='Confirm';setTimeout(function(){if(b.isConnected){b.removeAttribute('data-armed');b.textContent='Delete'}},4000)}
+    else guard(function(){var kind=S.view;return api('DELETE','/api/lib/'+kind+'/'+id).then(function(){toast('Deleted');return loadKind(kind)})});
   }
 });
 
