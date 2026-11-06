@@ -1,39 +1,37 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Itinerary Desk</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600&family=Roboto:wght@400;500;700&display=swap">
 <style>
-/* Layout: top tab bar over one working column; the itinerary editor pairs a form with a live paper preview. */
 :root{
   --bg:#f3f5fa; --surface:#ffffff; --surface-2:#eaeef7; --line:#d6dcea;
   --ink:#121a33; --muted:#586280; --accent:#1c43a6; --accent-ink:#ffffff; --accent-soft:#e1e8fb;
-  --danger:#b3261e; --ok:#1f7a4d;
+  --danger:#b3261e;
   --f-display:'Prompt','IBM Plex Sans Thai',system-ui,sans-serif;
   --f-body:'IBM Plex Sans Thai','Roboto',system-ui,sans-serif;
+  color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
+  :root{
     --bg:#0e1527; --surface:#16203a; --surface-2:#1e2a4a; --line:#2b3860;
     --ink:#e8ecf7; --muted:#9aa6c4; --accent:#86a8ff; --accent-ink:#0e1527; --accent-soft:#223463;
-    --danger:#ff8f86; --ok:#6fd3a2; color-scheme:dark;
+    --danger:#ff8f86; color-scheme:dark;
   }
 }
-:root[data-theme="dark"]{
-  --bg:#0e1527; --surface:#16203a; --surface-2:#1e2a4a; --line:#2b3860;
-  --ink:#e8ecf7; --muted:#9aa6c4; --accent:#86a8ff; --accent-ink:#0e1527; --accent-soft:#223463;
-  --danger:#ff8f86; --ok:#6fd3a2; color-scheme:dark;
-}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding:18px 16px 48px}
 .wrap{max-width:1280px;margin:0 auto}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0}
 h1{font-size:26px;letter-spacing:-.01em}
 h2{font-size:17px}
-h3{font-size:15px}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;margin-bottom:20px}
-.brand{font:600 18px/1 var(--f-display);letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+.brand{font:600 18px/1 var(--f-display);display:flex;align-items:center;gap:10px}
 .brand i{width:12px;height:12px;border-radius:3px;background:var(--accent);display:inline-block}
 .tabs{display:flex;gap:4px;flex-wrap:wrap}
 .tab{border:0;background:transparent;padding:8px 14px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500}
@@ -80,7 +78,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 .snip label{margin:0}
 .snip select{width:auto;max-width:60%;margin-left:auto;padding:3px 8px;font-size:13px}
 .banner{padding:10px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);margin-bottom:14px;font-size:14px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:90vw}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:90vw}
 .lib-list .row-card{grid-template-columns:minmax(0,1fr) auto}
 .pre{white-space:pre-line}
 @media (prefers-reduced-motion:no-preference){.tab,.btn{transition:background .15s,border-color .15s}}
@@ -107,9 +105,20 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 .sheet .p-terms{color:#555d75;font-size:12px;margin-top:6px}
 .sheet .p-thanks{text-align:center;font:700 14px/1.4 'Roboto',Arial,sans-serif;color:#3b4460;margin-top:14px}
 .sheet .p-reg{text-align:center;color:#555d75;font-size:12px}
+.sheet h4,.sheet .p-row{break-inside:avoid}
 @media (max-width:520px){.sheet{padding:18px 14px}.sheet .p-row{grid-template-columns:1fr;gap:0}.sheet ul{margin-left:22px}}
+@media print{
+  @page{margin:12mm}
+  body{background:#fff;padding:0}
+  .top,#banner,.head,#form,#toast{display:none!important}
+  .split{display:block}
+  .preview-col{position:static}
+  .scroll-x{overflow:visible}
+  .sheet{border:0;max-width:none;padding:0}
+}
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header class="top">
     <div class="brand"><i></i>Itinerary Desk</div>
@@ -138,15 +147,16 @@ var LIBS={
   snippets:{title:'ข้อความมาตรฐาน',hint:'เงื่อนไขโรงแรม มื้ออาหาร และ Terms ที่ใช้ซ้ำทุกใบ',add:'เพิ่มข้อความ',
     fields:[['title','ชื่อข้อความ','text'],['kind','ประเภท','select',SNIP_KINDS],['body','เนื้อหา','textarea']]}
 };
-var NAV=[['list','ใบ Itinerary'],['tours','ทัวร์/กิจกรรม'],['hotels','โรงแรม'],['snippets','ข้อความมาตรฐาน'],['company','ข้อมูลบริษัท']];
+var NAV=[['list','ใบ Itinerary'],['tours','ทัวร์/กิจกรรม'],['hotels','โรงแรม'],['snippets','ข้อความมาตรฐาน']];
+var KINDS=['tours','hotels','snippets','itineraries'];
 
 var S={tours:[],hotels:[],snippets:[],itineraries:[],company:null,loaded:{},view:'list',editId:null,draft:null,
-  readOnly:false,db:null,dl:null,dbDown:false,slow:false,saving:false,libEdit:null,delArmed:false,q:''};
+  saving:false,libEdit:null,delArmed:false,q:'',err:''};
 
 /* ---------- helpers ---------- */
 function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},2600)}
 function lines(t){return String(t||'').split('\n').map(function(s){return s.trim()}).filter(Boolean)}
-function parseD(s){var p=String(s||'').split('-').map(Number);return p.length===3&&p[0]?new Date(Date.UTC(p[0],p[1]-1,p[2])):null}
+function parseD(s){var p=String(s||'').slice(0,10).split('-').map(Number);return p.length===3&&p[0]?new Date(Date.UTC(p[0],p[1]-1,p[2])):null}
 function fmtDate(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}).format(d):''}
 function fmtShort(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(d):''}
 function today(){return new Intl.DateTimeFormat('en-CA').format(new Date())}
@@ -202,23 +212,21 @@ function textExport(d,c){
   return o.join('\n');
 }
 
-/* ---------- data ---------- */
-function bind(name){
-  S.db.collection(name).onSnapshot(function(snap){
-    S[name]=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
-    S.loaded[name]=true;checkLoaded();onData();
-  },function(){S.dbDown=true;renderBanner()});
+/* ---------- data (Notion through /api) ---------- */
+function api(method,url,body){
+  return fetch(url,{method:method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined})
+    .then(function(r){return r.json().catch(function(){return {}}).then(function(j){
+      if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j;
+    })});
 }
-function checkLoaded(){if(S.loaded.tours&&S.loaded.hotels&&S.loaded.snippets&&S.loaded.itineraries&&S.loaded.company){S.slow=false;clearTimeout(S.timer);renderBanner()}}
+function loadKind(k){
+  var url=k==='itineraries'?'/api/itineraries':'/api/lib/'+k;
+  return api('GET',url).then(function(list){S[k]=list;S.loaded[k]=true;S.err=''}).catch(function(e){S.err=e.message}).then(function(){renderBanner();onData()});
+}
+function loadAll(){return Promise.all(KINDS.map(loadKind))}
 function renderBanner(){
-  var b=$('#banner'),m='';
-  if(!S.db)m='เชื่อมต่อฐานข้อมูลไม่ได้ในมุมมองนี้ เปิดหน้านี้ใน Claude ที่ลงชื่อเข้าใช้เพื่อบันทึกข้อมูล';
-  else if(S.dbDown)m='อ่านข้อมูลไม่สำเร็จ ลองเปิดหน้านี้ใหม่';
-  else if(S.slow)m='ยังเชื่อมต่อฐานข้อมูลไม่ได้ ข้อมูลที่เห็นอาจไม่ใช่ล่าสุด';
-  else if(S.readOnly)m='คุณเปิดดูได้อย่างเดียว ไม่มีสิทธิ์แก้ไขข้อมูล';
-  b.innerHTML=m?'<div class="banner">'+esc(m)+'</div>':'';
+  $('#banner').innerHTML=S.err?'<div class="banner">เชื่อมต่อ Notion ไม่สำเร็จ: '+esc(S.err)+'</div>':'';
 }
-function can(){return !!S.db&&!S.readOnly}
 
 /* ---------- views ---------- */
 var main=function(){return $('#main')};
@@ -234,39 +242,37 @@ function go(v){
   S.view=v;S.libEdit=null;
   try{if(v!=='editor')history.replaceState(null,'','#'+v)}catch(e){}
   render();window.scrollTo(0,0);
+  if(v==='list')loadKind('itineraries');else if(LIBS[v])loadKind(v);
 }
 function render(){renderNav();var v=VIEWS[S.view]||VIEWS.list;v.mount()}
 function onData(){var v=VIEWS[S.view];if(v&&v.refresh)v.refresh()}
 
-/* list */
 VIEWS.list={
   mount:function(){
-    main().innerHTML='<div class="head"><h1>ใบ Itinerary</h1><div class="actions"><input id="q" type="search" placeholder="ค้นหาชื่อแขกหรือเลขที่" value="'+esc(S.q)+'"><button class="btn primary" data-act="new"'+(can()?'':' disabled')+'>+ สร้างใบใหม่</button></div></div><div id="rows"></div>';
+    main().innerHTML='<div class="head"><h1>ใบ Itinerary</h1><div class="actions"><input id="q" type="search" placeholder="ค้นหาชื่อแขกหรือเลขที่" value="'+esc(S.q)+'"><button class="btn primary" data-act="new">+ สร้างใบใหม่</button></div></div><div id="rows"></div>';
     this.refresh();
   },
   refresh:function(){
     var r=$('#rows');if(!r)return;
-    if(!S.loaded.itineraries){r.innerHTML='<div class="empty">กำลังโหลดข้อมูล</div>';return}
+    if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'โหลดข้อมูลไม่สำเร็จ':'กำลังโหลดข้อมูล')+'</div>';return}
     var q=S.q.trim().toLowerCase();
     var list=S.itineraries.slice().sort(function(a,b){return (+b.number||0)-(+a.number||0)}).filter(function(i){
       return !q||String(i.number).indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
     if(!list.length){
       r.innerHTML=S.itineraries.length?'<div class="empty">ไม่พบใบที่ตรงกับคำค้นหา</div>':
-        '<div class="empty"><h2>ยังไม่มีใบ Itinerary</h2><p>กด “สร้างใบใหม่” เพื่อเริ่มใบแรก ใบที่บันทึกจะอยู่ในรายการนี้และเปิดแก้ไขหรือทำสำเนาได้</p></div>';
+        '<div class="empty"><h2>ยังไม่มีใบ Itinerary</h2><p>กด “สร้างใบใหม่” เพื่อเริ่มใบแรก ใบที่บันทึกจะเก็บใน Notion และเปิดแก้ไขหรือทำสำเนาได้</p></div>';
       return;
     }
     r.innerHTML=list.map(function(i){
-      var hotels=(i.hotels||[]).filter(function(h){return h.v}).map(function(h){return h.v}).join(' · ');
       return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(ไม่ระบุชื่อ)')+'</b>'+
-        '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · ผู้ใหญ่ '+esc(i.adults)+' คน · '+((i.days||[]).length)+' วัน</div>'+
-        (hotels?'<div class="sub">'+esc(hotels)+'</div>':'')+'</div>'+
+        '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · ผู้ใหญ่ '+esc(i.adults)+' คน · '+esc(i.days)+' วัน</div>'+
+        (i.hotelsText?'<div class="sub">'+esc(i.hotelsText)+'</div>':'')+'</div>'+
         '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">เปิด</button>'+
-        '<button class="btn small" data-act="dup" data-id="'+esc(i.id)+'"'+(can()?'':' disabled')+'>ทำสำเนา</button></div></div>';
+        '<button class="btn small" data-act="dup" data-id="'+esc(i.id)+'">ทำสำเนา</button></div></div>';
     }).join('');
   }
 };
 
-/* editor */
 function tourOptions(){
   var cats=TOUR_CATS.map(function(c){
     var items=S.tours.filter(function(t){return (t.cat||'Other')===c[0]}).sort(byName);
@@ -288,10 +294,12 @@ function daysHTML(){
       '<textarea id="day-'+i+'" data-day="'+i+'" rows="5" placeholder="หนึ่งบรรทัดต่อหนึ่งรายการ">'+esc(d.text)+'</textarea></div>';
   }).join('');
 }
-function pairsHTML(key,short,list,ph1,ph2){
+function pairsHTML(key){
+  var hot=key==='hotels';
   return S.draft[key].map(function(p,i){
-    return '<div class="pair'+(short?' short':'')+'"><input data-pair="'+key+'" data-i="'+i+'" data-k="k" value="'+esc(p.k)+'" placeholder="'+ph1+'" aria-label="'+ph1+'">'+
-      '<input data-pair="'+key+'" data-i="'+i+'" data-k="v" value="'+esc(p.v)+'" placeholder="'+ph2+'" aria-label="'+ph2+'"'+(list?' list="'+list+'"':'')+'>'+
+    var ph1=hot?'เมือง':'หัวข้อ',ph2=hot?'ชื่อโรงแรม':'ประเภทรถ';
+    return '<div class="pair'+(hot?' short':'')+'"><input data-pair="'+key+'" data-i="'+i+'" data-k="k" value="'+esc(p.k)+'" placeholder="'+ph1+'" aria-label="'+ph1+'">'+
+      '<input data-pair="'+key+'" data-i="'+i+'" data-k="v" value="'+esc(p.v)+'" placeholder="'+ph2+'" aria-label="'+ph2+'"'+(hot?' list="hotelNames"':'')+'>'+
       '<button class="btn small danger" data-act="rmPair" data-key="'+key+'" data-i="'+i+'" aria-label="ลบแถว">ลบ</button></div>';
   }).join('');
 }
@@ -308,18 +316,19 @@ VIEWS.editor={
     main().innerHTML=
      '<div class="head"><h1>'+(S.editId?'แก้ไขใบเลขที่ '+esc(d.number):'ใบ Itinerary ใหม่')+'</h1><div class="actions">'+
        '<button class="btn" data-act="back">กลับ</button>'+
-       (S.dl?'<button class="btn" data-act="download">ดาวน์โหลดไฟล์ .html</button>':'')+
+       '<button class="btn" data-act="print">พิมพ์ / บันทึกเป็น PDF</button>'+
+       '<button class="btn" data-act="download">ดาวน์โหลด .html</button>'+
        '<button class="btn" data-act="copy">คัดลอกเป็นข้อความ</button>'+
-       (S.editId&&can()?'<button class="btn danger" data-act="delete" id="delBtn">ลบใบนี้</button>':'')+
-       '<button class="btn primary" data-act="save"'+(can()?'':' disabled')+'>บันทึก</button></div></div>'+
+       (S.editId?'<button class="btn danger" data-act="delete">ลบใบนี้</button>':'')+
+       '<button class="btn primary" data-act="save">บันทึก</button></div></div>'+
      '<datalist id="hotelNames">'+hotelNames+'</datalist>'+
      '<div class="split"><div class="stack" id="form">'+
        '<section class="card stack"><h2>ข้อมูลแขก</h2><div class="grid2">'+fld('เลขที่ใบ','f-number','number','number')+fld('วันที่ออกใบ','f-issue','issueDate','date')+'</div>'+
          fld('ชื่อแขก','f-guest','guestName')+
          '<div class="grid3">'+fld('วันเดินทางมา','f-arr','arrival','date')+fld('วันเดินทางกลับ','f-dep','departure','date')+fld('ผู้ใหญ่ (>120 ซม.)','f-adults','adults','number','min="1"')+'</div></section>'+
        '<section class="card stack"><div class="head" style="margin:0"><h2>โปรแกรมรายวัน</h2><button class="btn small" data-act="genDays">สร้างจำนวนวันตามวันที่</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ เพิ่มวัน</button></div></section>'+
-       '<section class="card stack"><h2>รถรับส่ง</h2><div id="transport">'+pairsHTML('transport',false,'','หัวข้อ เช่น Bangkok to Pattaya Transport by','ประเภทรถ')+'</div><div><button class="btn small" data-act="addPair" data-key="transport">+ เพิ่มแถว</button></div></section>'+
-       '<section class="card stack"><h2>โรงแรม</h2><div id="hotels">'+pairsHTML('hotels',true,'hotelNames','เมือง','ชื่อโรงแรม')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ เพิ่มโรงแรม</button></div>'+
+       '<section class="card stack"><h2>รถรับส่ง</h2><div id="transport">'+pairsHTML('transport')+'</div><div><button class="btn small" data-act="addPair" data-key="transport">+ เพิ่มแถว</button></div></section>'+
+       '<section class="card stack"><h2>โรงแรม</h2><div id="hotels">'+pairsHTML('hotels')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ เพิ่มโรงแรม</button></div>'+
          area('เงื่อนไขการจองโรงแรม','f-hc','hotelCond','hotelCond',6)+'</section>'+
        '<section class="card stack"><h2>มื้ออาหารและอื่น ๆ</h2>'+area('Meals','f-meals','meals','meals',4)+
          '<div class="grid2">'+fld('Free Thailand Data Sim Cards','f-sim','sim')+fld('Booking Agent','f-agent','agent')+'</div>'+
@@ -331,7 +340,6 @@ VIEWS.editor={
   refresh:null
 };
 
-/* library views */
 function libSummary(kind,it){
   if(kind==='tours')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.cat||'Other')+'</span>'+esc(it.note||'')+'</div>';
   if(kind==='hotels')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.city||'Other')+'</span></div>';
@@ -349,40 +357,27 @@ function makeLib(kind){
         return '<div><label for="'+id+'">'+f[1]+'</label><input id="'+id+'"></div>';
       }).join('');
       main().innerHTML='<div class="head"><div><h1>'+esc(L.title)+'</h1><div class="sub">'+esc(L.hint)+'</div></div></div>'+
-        (can()?'<section class="card stack" style="margin-bottom:16px"><h2 id="lib-form-title">'+esc(L.add)+'</h2>'+form+'<div class="actions"><button class="btn primary" data-act="libSave">บันทึก</button><button class="btn" data-act="libCancel" id="libCancel" hidden>ยกเลิกการแก้ไข</button></div></section>':'')+
+        '<section class="card stack" style="margin-bottom:16px"><h2 id="lib-form-title">'+esc(L.add)+'</h2>'+form+'<div class="actions"><button class="btn primary" data-act="libSave">บันทึก</button><button class="btn" data-act="libCancel" id="libCancel" hidden>ยกเลิกการแก้ไข</button></div></section>'+
         '<div class="lib-list" id="lib"></div>';
       this.refresh();
     },
     refresh:function(){
       var r=$('#lib');if(!r)return;
-      if(!S.loaded[kind]){r.innerHTML='<div class="empty">กำลังโหลดข้อมูล</div>';return}
+      if(!S.loaded[kind]){r.innerHTML='<div class="empty">'+(S.err?'โหลดข้อมูลไม่สำเร็จ':'กำลังโหลดข้อมูล')+'</div>';return}
       var list=S[kind].slice().sort(byName);
       if(!list.length){r.innerHTML='<div class="empty"><h2>ยังไม่มีรายการ</h2><p>เพิ่มรายการแรกจากฟอร์มด้านบน</p></div>';return}
       r.innerHTML=list.map(function(it){
-        return '<div class="row-card"><div style="min-width:0" class="pre">'+libSummary(kind,it)+'</div>'+(can()?'<div class="actions"><button class="btn small" data-act="libEdit" data-id="'+esc(it.id)+'">แก้ไข</button><button class="btn small danger" data-act="libDel" data-id="'+esc(it.id)+'">ลบ</button></div>':'')+'</div>';
+        return '<div class="row-card"><div style="min-width:0" class="pre">'+libSummary(kind,it)+'</div><div class="actions"><button class="btn small" data-act="libEdit" data-id="'+esc(it.id)+'">แก้ไข</button><button class="btn small danger" data-act="libDel" data-id="'+esc(it.id)+'">ลบ</button></div></div>';
       }).join('');
     }
   };
 }
 VIEWS.tours=makeLib('tours');VIEWS.hotels=makeLib('hotels');VIEWS.snippets=makeLib('snippets');
 
-/* company */
-var CO_FIELDS=[['brand','ชื่อแบรนด์ (แสดงมุมซ้ายบนของใบ)'],['name','ชื่อบริษัท'],['address','ที่อยู่'],['phones','เบอร์โทร'],['email','อีเมล'],['location','ข้อความระบุตำแหน่ง'],['regNo','ข้อความทะเบียนท้ายใบ']];
-VIEWS.company={
-  mount:function(){
-    var c=company();
-    main().innerHTML='<div class="head"><div><h1>ข้อมูลบริษัท</h1><div class="sub">แสดงที่หัวใบและท้ายใบ Itinerary ทุกใบ</div></div></div>'+
-      '<section class="card stack" style="max-width:640px">'+CO_FIELDS.map(function(f){return '<div><label for="co-'+f[0]+'">'+f[1]+'</label><input id="co-'+f[0]+'" value="'+esc(c[f[0]])+'"'+(can()?'':' disabled')+'></div>'}).join('')+
-      '<div class="actions"><button class="btn primary" data-act="coSave"'+(can()?'':' disabled')+'>บันทึก</button></div></section>';
-  },
-  refresh:null
-};
-
 /* ---------- actions ---------- */
-async function guard(fn){
+function guard(fn){
   if(S.saving)return;S.saving=true;
-  try{await fn()}catch(e){toast(e&&e.code==='quota_exceeded'?'พื้นที่ฐานข้อมูลเต็ม ลบรายการเก่าก่อน':'บันทึกไม่สำเร็จ ลองอีกครั้ง')}
-  finally{S.saving=false}
+  Promise.resolve().then(fn).catch(function(e){toast('ไม่สำเร็จ: '+(e&&e.message||'ลองอีกครั้ง'))}).then(function(){S.saving=false});
 }
 function openDraft(d,id){S.draft=d;S.editId=id||null;S.delArmed=false;S.view='editor';render();window.scrollTo(0,0)}
 function genDays(){
@@ -393,14 +388,15 @@ function genDays(){
   S.draft.days.length=Math.max(n,1);
   $('#days').innerHTML=daysHTML();VIEWS.editor.preview();
 }
+function refreshPairs(key){$('#'+key).innerHTML=pairsHTML(key)}
 
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]');if(g){go(g.getAttribute('data-go'));return}
   var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   var a=b.getAttribute('data-act'),i=+b.getAttribute('data-i'),id=b.getAttribute('data-id'),key=b.getAttribute('data-key');
   if(a==='new'){openDraft(newDraft(),null)}
-  else if(a==='open'){var it=S.itineraries.filter(function(x){return x.id===id})[0];if(it)openDraft(clone(it),id)}
-  else if(a==='dup'){var s=S.itineraries.filter(function(x){return x.id===id})[0];if(s){var c=clone(s);delete c.id;c.number=nextNumber();c.issueDate=today();c.guestName='';openDraft(c,null)}}
+  else if(a==='open'){guard(function(){return api('GET','/api/itineraries/'+id).then(function(d){openDraft(d,id)})})}
+  else if(a==='dup'){guard(function(){return api('GET','/api/itineraries/'+id).then(function(d){d.number=nextNumber();d.issueDate=today();d.guestName='';openDraft(d,null)})})}
   else if(a==='back'){go('list')}
   else if(a==='addDay'){S.draft.days.push({text:''});$('#days').innerHTML=daysHTML();VIEWS.editor.preview()}
   else if(a==='rmDay'){S.draft.days.splice(i,1);$('#days').innerHTML=daysHTML();VIEWS.editor.preview()}
@@ -411,34 +407,44 @@ document.addEventListener('click',function(e){
     var line=t.name+(t.note?' '+t.note:'');var cur=S.draft.days[i].text.replace(/\s+$/,'');
     S.draft.days[i].text=(cur?cur+'\n':'')+line;$('#days').innerHTML=daysHTML();VIEWS.editor.preview();
   }
-  else if(a==='addPair'){S.draft[key].push({k:'',v:''});$('#'+key).innerHTML=pairsHTML(key,key==='hotels',key==='hotels'?'hotelNames':'',key==='hotels'?'เมือง':'หัวข้อ',key==='hotels'?'ชื่อโรงแรม':'ประเภทรถ')}
-  else if(a==='rmPair'){S.draft[key].splice(i,1);$('#'+key).innerHTML=pairsHTML(key,key==='hotels',key==='hotels'?'hotelNames':'',key==='hotels'?'เมือง':'หัวข้อ',key==='hotels'?'ชื่อโรงแรม':'ประเภทรถ');VIEWS.editor.preview()}
-  else if(a==='save'){guard(async function(){
-    var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;d.updatedAt=Date.now();
-    var coll=S.db.collection('itineraries');var ref=S.editId?coll.doc(S.editId):coll.doc();
-    if(!S.editId)d.createdAt=Date.now();
-    await ref.set(d);S.editId=ref.id;toast('บันทึกแล้ว');
-    var h=$('.head h1');if(h)h.textContent='แก้ไขใบเลขที่ '+d.number;
+  else if(a==='addPair'){S.draft[key].push({k:'',v:''});refreshPairs(key)}
+  else if(a==='rmPair'){S.draft[key].splice(i,1);refreshPairs(key);VIEWS.editor.preview()}
+  else if(a==='save'){guard(function(){
+    var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;
+    var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id});
+    return req.then(function(){
+      toast('บันทึกลง Notion แล้ว');
+      var h=$('.head h1');if(h)h.textContent='แก้ไขใบเลขที่ '+d.number;
+      var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='ลบใบนี้';act.insertBefore(nb,pr)}
+      loadKind('itineraries');
+    });
   })}
   else if(a==='delete'){
     if(!S.delArmed){S.delArmed=true;b.textContent='กดอีกครั้งเพื่อยืนยันลบ';setTimeout(function(){S.delArmed=false;if(b.isConnected)b.textContent='ลบใบนี้'},4000)}
-    else guard(async function(){await S.db.collection('itineraries').doc(S.editId).delete();toast('ลบแล้ว');S.draft=null;S.editId=null;go('list')})
+    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('ลบแล้ว');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list')})})
   }
+  else if(a==='print'){window.print()}
   else if(a==='download'){
-    var d2=S.draft;S.dl.save({filename:('Itinerary-'+d2.number+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html'),data:fullHTML(d2,company())})
-      .then(function(){toast('บันทึกไฟล์แล้ว')}).catch(function(er){if(er&&er.code!=='declined')toast('บันทึกไฟล์ไม่ได้ในมุมมองนี้')});
+    var d2=S.draft;var blob=new Blob([fullHTML(d2,company())],{type:'text/html'});
+    var url=URL.createObjectURL(blob);var lk=document.createElement('a');
+    lk.href=url;lk.download='Itinerary-'+d2.number+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html';
+    document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
   }
   else if(a==='copy'){
     var txt=textExport(S.draft,company());
-    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast('คัดลอกแล้ว วางในแชทได้เลย')}).catch(function(){toast('คัดลอกไม่ได้ในมุมมองนี้ ใช้ปุ่มดาวน์โหลดแทน')});
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast('คัดลอกแล้ว วางในแชทได้เลย')}).catch(function(){toast('คัดลอกไม่ได้ ใช้ปุ่มดาวน์โหลดแทน')});
   }
-  else if(a==='libSave'){guard(async function(){
+  else if(a==='libSave'){guard(function(){
     var kind=S.view,L=LIBS[kind],data={};
     L.fields.forEach(function(f){data[f[0]]=$('#lf-'+f[0]).value.trim()});
     if(!data[L.fields[0][0]]){toast('กรอกชื่อก่อนบันทึก');return}
-    var coll=S.db.collection(kind);await coll.doc(S.libEdit||undefined).set(data);
-    S.libEdit=null;L.fields.forEach(function(f){var el=$('#lf-'+f[0]);if(f[2]!=='select')el.value=''});
-    $('#libCancel').hidden=true;$('#lib-form-title').textContent=L.add;toast('บันทึกแล้ว');
+    var base='/api/lib/'+kind;
+    var req=S.libEdit?api('PUT',base+'/'+S.libEdit,data):api('POST',base,data);
+    return req.then(function(){
+      S.libEdit=null;L.fields.forEach(function(f){var el=$('#lf-'+f[0]);if(f[2]!=='select')el.value=''});
+      $('#libCancel').hidden=true;$('#lib-form-title').textContent=L.add;toast('บันทึกลง Notion แล้ว');
+      return loadKind(kind);
+    });
   })}
   else if(a==='libEdit'){
     var kind2=S.view,it2=S[kind2].filter(function(x){return x.id===id})[0];if(!it2)return;
@@ -450,12 +456,8 @@ document.addEventListener('click',function(e){
   }
   else if(a==='libDel'){
     if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='ยืนยันลบ';setTimeout(function(){if(b.isConnected){b.removeAttribute('data-armed');b.textContent='ลบ'}},4000)}
-    else guard(async function(){await S.db.collection(S.view).doc(id).delete();toast('ลบแล้ว')});
+    else guard(function(){var kind=S.view;return api('DELETE','/api/lib/'+kind+'/'+id).then(function(){toast('ลบแล้ว');return loadKind(kind)})});
   }
-  else if(a==='coSave'){guard(async function(){
-    var d={};CO_FIELDS.forEach(function(f){d[f[0]]=$('#co-'+f[0]).value.trim()});
-    await S.db.doc('settings/company').set(d);toast('บันทึกแล้ว');
-  })}
 });
 
 document.addEventListener('input',function(e){
@@ -479,30 +481,20 @@ document.addEventListener('change',function(e){
 window.addEventListener('hashchange',function(){
   var h=location.hash.slice(1);if(VIEWS[h]&&h!=='editor'&&h!==S.view){S.view=h;render()}
 });
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&S.view!=='editor'){if(S.view==='list')loadKind('itineraries');else if(LIBS[S.view])loadKind(S.view)}
+});
 
 /* ---------- start ---------- */
-(async function(){
+(function(){
   var h=location.hash.slice(1);if(VIEWS[h]&&h!=='editor')S.view=h;
   render();
-  try{
-    S.db=await window.claude.use('db');
-    var user=await window.claude.use('user');
-    S.dl=await window.claude.use('downloads');
-    if(user&&user.can){try{S.readOnly=(await user.can('data.write'))===false}catch(e){}}
-  }catch(e){S.db=null}
-  renderBanner();
-  if(!S.db){render();return}
-  S.timer=setTimeout(function(){S.slow=true;renderBanner()},10000);
-  ['tours','hotels','snippets','itineraries'].forEach(bind);
-  S.db.doc('settings/company').onSnapshot(function(snap){
-    var first=!S.loaded.company;
-    S.company=snap.exists?snap.data():null;S.loaded.company=true;checkLoaded();
-    if(S.view==='editor')VIEWS.editor.preview();
-    if(S.view==='company'&&first)VIEWS.company.mount();
-  },function(){S.dbDown=true;renderBanner()});
-  render();
+  fetch('/company.json').then(function(r){return r.ok?r.json():null}).then(function(c){
+    if(c){S.company=c;if(S.view==='editor')VIEWS.editor.preview()}
+  }).catch(function(){});
+  loadAll();
 })();
 })();
 </script>
-
-</body></html>
+</body>
+</html>
