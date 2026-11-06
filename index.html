@@ -166,7 +166,7 @@ function fmtDate(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-US',{we
 function fmtShort(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(d):''}
 function today(){return new Intl.DateTimeFormat('en-CA').format(new Date())}
 function company(){return Object.assign({},CO_DEFAULT,S.company||{})}
-function nextNumber(){return Math.max.apply(null,[1179].concat(S.itineraries.map(function(i){return +i.number||0})))+1}
+function nextNumber(){return Math.max.apply(null,[1].concat(S.itineraries.map(function(i){return +i.number||0})))+1}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function byName(a,b){return String(a.name||a.title||'').localeCompare(String(b.name||b.title||''))}
 
