@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Itinerary Desk</title>
+<title>Parata Phatra</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600&family=Roboto:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -121,7 +121,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand"><i></i>Itinerary Desk</div>
+    <div class="brand"><i></i>Parata Phatra</div>
     <nav class="tabs" id="nav" aria-label="Main menu"></nav>
   </header>
   <div id="banner"></div>
@@ -149,7 +149,6 @@ var LIBS={
 };
 var NAV=[['list','Itineraries'],['tours','Tours'],['hotels','Hotels'],['snippets','Standard text']];
 var KINDS=['tours','hotels','snippets','itineraries'];
-// Options for the Transport dropdowns. Edit these two lists to change the choices.
 var ROUTES=['Bangkok to Pattaya Transport by','Pattaya to Bangkok Transport by','Bangkok Airport Drop-off by','Other Tours Travel by'];
 var VEHICLES=['Car','6 Seater','9 Seater','12 Seater','Bus'];
 
@@ -164,7 +163,14 @@ function fmtDate(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-US',{we
 function fmtShort(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(d):''}
 function today(){return new Intl.DateTimeFormat('en-CA').format(new Date())}
 function company(){return Object.assign({},CO_DEFAULT,S.company||{})}
-function nextNumber(){return Math.max.apply(null,[1179].concat(S.itineraries.map(function(i){return +i.number||0})))+1}
+function nextNumber(){
+  var nums = S.itineraries.map(function(i){
+    var n = parseInt(i.number, 10);
+    return isNaN(n) ? -1 : n;
+  });
+  var next = Math.max.apply(null, [-1].concat(nums)) + 1;
+  return String(next).padStart(4, '0');
+}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function byName(a,b){return String(a.name||a.title||'').localeCompare(String(b.name||b.title||''))}
 
@@ -179,12 +185,13 @@ function newDraft(){
 
 /* ---------- document (preview, download, text) ---------- */
 function docHTML(d,c){
+  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
   var row=function(k,v){return '<div class="p-row"><div>'+esc(k)+'</div><div>'+esc(v)+'</div></div>'};
   var days=(d.days||[]).map(function(x,i){return '<h4>Day '+(i+1)+'</h4><ul>'+lines(x.text).map(function(l){return '<li>'+esc(l)+'</li>'}).join('')+'</ul>'}).join('');
   var tr=(d.transport||[]).filter(function(p){return p.k||p.v}).map(function(p){return row(p.k,p.v)}).join('');
   var ho=(d.hotels||[]).filter(function(p){return p.v}).map(function(p){return row(p.k+' Hotel',p.v)}).join('');
   return '<div class="sheet">'+
-   '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(d.number)+'</b></div></div>'+
+   '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(numStr)+'</b></div></div>'+
    '<div class="p-band"><h2>'+esc(c.name)+'</h2>'+(c.address?'<p>'+esc(c.address)+'</p>':'')+(c.phones?'<p>Phone '+esc(c.phones)+'</p>':'')+(c.email?'<p>Email '+esc(c.email)+'</p>':'')+(c.location?'<p>'+esc(c.location)+'</p>':'')+'</div>'+
    '<div class="p-title">Travel Itinerary</div>'+
    row('Guest Name',d.guestName)+row('Arrival Date',fmtDate(d.arrival))+row('Departure Date',fmtDate(d.departure))+row('Number of Adults(>120cm)',d.adults)+
@@ -199,10 +206,12 @@ function docHTML(d,c){
    '</div>';
 }
 function fullHTML(d,c){
-  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Itinerary '+esc(d.number)+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+$('#paper-css').textContent+'</style></head><body>'+docHTML(d,c)+'</body></html>';
+  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Itinerary '+esc(numStr)+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+$('#paper-css').textContent+'</style></head><body>'+docHTML(d,c)+'</body></html>';
 }
 function textExport(d,c){
-  var o=[c.name,'Itinerary Number '+d.number,'',
+  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
+  var o=[c.name,'Itinerary Number '+numStr,'',
     'Guest Name: '+d.guestName,'Arrival Date: '+fmtDate(d.arrival),'Departure Date: '+fmtDate(d.departure),'Number of Adults(>120cm): '+d.adults,''];
   (d.days||[]).forEach(function(x,i){o.push('Day '+(i+1));lines(x.text).forEach(function(l){o.push('- '+l)});o.push('')});
   (d.transport||[]).forEach(function(p){if(p.k||p.v)o.push(p.k+': '+p.v)});o.push('');
@@ -260,14 +269,16 @@ VIEWS.list={
     if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
     var q=S.q.trim().toLowerCase();
     var list=S.itineraries.slice().sort(function(a,b){return (+b.number||0)-(+a.number||0)}).filter(function(i){
-      return !q||String(i.number).indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
+      var nStr = String(i.number == null ? '' : i.number).padStart(4, '0');
+      return !q||nStr.indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
     if(!list.length){
       r.innerHTML=S.itineraries.length?'<div class="empty">No itineraries match your search</div>':
         '<div class="empty"><h2>No itineraries yet</h2><p>Click “New itinerary” to create the first one. Saved itineraries are stored in Notion and can be reopened, edited or duplicated.</p></div>';
       return;
     }
     r.innerHTML=list.map(function(i){
-      return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
+      var numDisplay = String(i.number == null ? '' : i.number).padStart(4, '0');
+      return '<div class="row-card"><div class="num">'+esc(numDisplay)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
         '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · '+esc(i.adults)+' adults · '+esc(i.days)+' days</div>'+
         (i.hotelsText?'<div class="sub">'+esc(i.hotelsText)+'</div>':'')+'</div>'+
         '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">Open</button>'+
@@ -320,9 +331,10 @@ function area(label,id,f,kind,rows){
 VIEWS.editor={
   mount:function(){
     var d=S.draft;if(!d){go('list');return}
+    var numDisplay = String(d.number == null ? '' : d.number).padStart(4, '0');
     var hotelNames=S.hotels.slice().sort(byName).map(function(h){return '<option value="'+esc(h.name)+'">'}).join('');
     main().innerHTML=
-     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(d.number):'New itinerary')+'</h1><div class="actions">'+
+     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(numDisplay):'New itinerary')+'</h1><div class="actions">'+
        '<button class="btn" data-act="back">Back</button>'+
        '<button class="btn" data-act="print">Print / Save as PDF</button>'+
        '<button class="btn" data-act="download">Download .html</button>'+
@@ -331,7 +343,7 @@ VIEWS.editor={
        '<button class="btn primary" data-act="save">Save</button></div></div>'+
      '<datalist id="hotelNames">'+hotelNames+'</datalist>'+
      '<div class="split"><div class="stack" id="form">'+
-       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','number')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
+       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','text')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
          fld('Guest name','f-guest','guestName')+
          '<div class="grid3">'+fld('Arrival date','f-arr','arrival','date')+fld('Departure date','f-dep','departure','date')+fld('Adults (>120 cm)','f-adults','adults','number','min="1"')+'</div></section>'+
        '<section class="card stack"><div class="head" style="margin:0"><h2>Daily program</h2><button class="btn small" data-act="genDays">Set days from dates</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ Add day</button></div></section>'+
@@ -418,11 +430,15 @@ document.addEventListener('click',function(e){
   else if(a==='addPair'){S.draft[key].push({k:'',v:''});refreshPairs(key)}
   else if(a==='rmPair'){S.draft[key].splice(i,1);refreshPairs(key);VIEWS.editor.preview()}
   else if(a==='save'){guard(function(){
-    var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;
+    var d=clone(S.draft);
+    var parsedNum = parseInt(d.number, 10);
+    d.number = isNaN(parsedNum) ? d.number : parsedNum;
+    d.adults = +d.adults || 0;
     var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id});
     return req.then(function(){
       toast('Saved to Notion');
-      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+d.number;
+      var numDisplay = String(d.number == null ? '' : d.number).padStart(4, '0');
+      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+numDisplay;
       var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='Delete itinerary';act.insertBefore(nb,pr)}
       loadKind('itineraries');
     });
@@ -435,7 +451,8 @@ document.addEventListener('click',function(e){
   else if(a==='download'){
     var d2=S.draft;var blob=new Blob([fullHTML(d2,company())],{type:'text/html'});
     var url=URL.createObjectURL(blob);var lk=document.createElement('a');
-    lk.href=url;lk.download='Itinerary-'+d2.number+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html';
+    var numStr = String(d2.number == null ? '' : d2.number).padStart(4, '0');
+    lk.href=url;lk.download='Itinerary-'+numStr+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html';
     document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
   }
   else if(a==='copy'){
