@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Parata Phatra</title>
+<title>Parata Phattra</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600&family=Roboto:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -121,7 +121,7 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand"><i></i>Parata Phatra</div>
+    <div class="brand"><i></i>Parata Ite</div>
     <nav class="tabs" id="nav" aria-label="Main menu"></nav>
   </header>
   <div id="banner"></div>
@@ -149,28 +149,24 @@ var LIBS={
 };
 var NAV=[['list','Itineraries'],['tours','Tours'],['hotels','Hotels'],['snippets','Standard text']];
 var KINDS=['tours','hotels','snippets','itineraries'];
+// Options for the Transport dropdowns. Edit these two lists to change the choices.
 var ROUTES=['Bangkok to Pattaya Transport by','Pattaya to Bangkok Transport by','Bangkok Airport Drop-off by','Other Tours Travel by'];
 var VEHICLES=['Car','6 Seater','9 Seater','12 Seater','Bus'];
+// Sales staff shown in the Booking Agent dropdown. Add each person's name to this list.
+var AGENTS=['Dhanuka'];
 
 var S={tours:[],hotels:[],snippets:[],itineraries:[],company:null,loaded:{},view:'list',editId:null,draft:null,
-  saving:false,libEdit:null,delArmed:false,q:'',err:''};
+  saving:false,dirty:false,libEdit:null,delArmed:false,q:'',err:'',loadP:null};
 
 /* ---------- helpers ---------- */
-function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},2600)}
+function toast(msg,ms){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},ms||2600)}
 function lines(t){return String(t||'').split('\n').map(function(s){return s.trim()}).filter(Boolean)}
 function parseD(s){var p=String(s||'').slice(0,10).split('-').map(Number);return p.length===3&&p[0]?new Date(Date.UTC(p[0],p[1]-1,p[2])):null}
 function fmtDate(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}).format(d):''}
 function fmtShort(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(d):''}
 function today(){return new Intl.DateTimeFormat('en-CA').format(new Date())}
 function company(){return Object.assign({},CO_DEFAULT,S.company||{})}
-function nextNumber(){
-  var nums = S.itineraries.map(function(i){
-    var n = parseInt(i.number, 10);
-    return isNaN(n) ? -1 : n;
-  });
-  var next = Math.max.apply(null, [-1].concat(nums)) + 1;
-  return String(next).padStart(4, '0');
-}
+function nextNumber(){return Math.max.apply(null,[1179].concat(S.itineraries.map(function(i){return +i.number||0})))+1}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function byName(a,b){return String(a.name||a.title||'').localeCompare(String(b.name||b.title||''))}
 
@@ -185,13 +181,12 @@ function newDraft(){
 
 /* ---------- document (preview, download, text) ---------- */
 function docHTML(d,c){
-  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
   var row=function(k,v){return '<div class="p-row"><div>'+esc(k)+'</div><div>'+esc(v)+'</div></div>'};
   var days=(d.days||[]).map(function(x,i){return '<h4>Day '+(i+1)+'</h4><ul>'+lines(x.text).map(function(l){return '<li>'+esc(l)+'</li>'}).join('')+'</ul>'}).join('');
   var tr=(d.transport||[]).filter(function(p){return p.k||p.v}).map(function(p){return row(p.k,p.v)}).join('');
   var ho=(d.hotels||[]).filter(function(p){return p.v}).map(function(p){return row(p.k+' Hotel',p.v)}).join('');
   return '<div class="sheet">'+
-   '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(numStr)+'</b></div></div>'+
+   '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(d.number)+'</b></div></div>'+
    '<div class="p-band"><h2>'+esc(c.name)+'</h2>'+(c.address?'<p>'+esc(c.address)+'</p>':'')+(c.phones?'<p>Phone '+esc(c.phones)+'</p>':'')+(c.email?'<p>Email '+esc(c.email)+'</p>':'')+(c.location?'<p>'+esc(c.location)+'</p>':'')+'</div>'+
    '<div class="p-title">Travel Itinerary</div>'+
    row('Guest Name',d.guestName)+row('Arrival Date',fmtDate(d.arrival))+row('Departure Date',fmtDate(d.departure))+row('Number of Adults(>120cm)',d.adults)+
@@ -206,12 +201,10 @@ function docHTML(d,c){
    '</div>';
 }
 function fullHTML(d,c){
-  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
-  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Itinerary '+esc(numStr)+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+$('#paper-css').textContent+'</style></head><body>'+docHTML(d,c)+'</body></html>';
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Itinerary '+esc(d.number)+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+$('#paper-css').textContent+'</style></head><body>'+docHTML(d,c)+'</body></html>';
 }
 function textExport(d,c){
-  var numStr = String(d.number == null ? '' : d.number).padStart(4, '0');
-  var o=[c.name,'Itinerary Number '+numStr,'',
+  var o=[c.name,'Itinerary Number '+d.number,'',
     'Guest Name: '+d.guestName,'Arrival Date: '+fmtDate(d.arrival),'Departure Date: '+fmtDate(d.departure),'Number of Adults(>120cm): '+d.adults,''];
   (d.days||[]).forEach(function(x,i){o.push('Day '+(i+1));lines(x.text).forEach(function(l){o.push('- '+l)});o.push('')});
   (d.transport||[]).forEach(function(p){if(p.k||p.v)o.push(p.k+': '+p.v)});o.push('');
@@ -226,16 +219,26 @@ function textExport(d,c){
 
 /* ---------- data (Notion through /api) ---------- */
 function api(method,url,body){
-  return fetch(url,{method:method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined})
+  var ctl=new AbortController();var tm=setTimeout(function(){ctl.abort()},25000);
+  return fetch(url,{method:method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:ctl.signal})
     .then(function(r){return r.json().catch(function(){return {}}).then(function(j){
-      if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j;
-    })});
+      if(!r.ok){var er=new Error(j.error||('HTTP '+r.status));er.status=r.status;throw er}return j;
+    })})
+    .catch(function(e){if(e&&e.name==='AbortError')throw new Error('The request timed out. Check your connection and try again.');throw e})
+    .finally(function(){clearTimeout(tm)});
 }
 function loadKind(k){
   var url=k==='itineraries'?'/api/itineraries':'/api/lib/'+k;
   return api('GET',url).then(function(list){S[k]=list;S.loaded[k]=true;S.err=''}).catch(function(e){S.err=e.message}).then(function(){renderBanner();onData()});
 }
-function loadAll(){return Promise.all(KINDS.map(loadKind))}
+function loadAll(){S.loadP=Promise.all(KINDS.map(loadKind));return S.loadP}
+// Wait until tours, hotels, standard text and the itinerary list have loaded, so forms never open with empty dropdowns.
+function ensureReady(){
+  return (S.loadP||Promise.resolve()).then(function(){
+    var need=KINDS.filter(function(k){return !S.loaded[k]});
+    return need.length?Promise.all(need.map(loadKind)):null;
+  });
+}
 function renderBanner(){
   $('#banner').innerHTML=S.err?'<div class="banner">Could not reach Notion: '+esc(S.err)+'</div>':'';
 }
@@ -250,8 +253,9 @@ function renderNav(){
     return '<button class="tab" data-go="'+n[0]+'"'+cur+'>'+esc(n[1])+'</button>';
   }).join('');
 }
-function go(v){
-  S.view=v;S.libEdit=null;
+function go(v,force){
+  if(S.view==='editor'&&S.dirty&&!force&&!window.confirm('You have unsaved changes. Leave without saving?'))return;
+  S.dirty=false;S.view=v;S.libEdit=null;
   try{if(v!=='editor')history.replaceState(null,'','#'+v)}catch(e){}
   render();window.scrollTo(0,0);
   if(v==='list')loadKind('itineraries');else if(LIBS[v])loadKind(v);
@@ -269,16 +273,14 @@ VIEWS.list={
     if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
     var q=S.q.trim().toLowerCase();
     var list=S.itineraries.slice().sort(function(a,b){return (+b.number||0)-(+a.number||0)}).filter(function(i){
-      var nStr = String(i.number == null ? '' : i.number).padStart(4, '0');
-      return !q||nStr.indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
+      return !q||String(i.number).indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
     if(!list.length){
       r.innerHTML=S.itineraries.length?'<div class="empty">No itineraries match your search</div>':
         '<div class="empty"><h2>No itineraries yet</h2><p>Click “New itinerary” to create the first one. Saved itineraries are stored in Notion and can be reopened, edited or duplicated.</p></div>';
       return;
     }
     r.innerHTML=list.map(function(i){
-      var numDisplay = String(i.number == null ? '' : i.number).padStart(4, '0');
-      return '<div class="row-card"><div class="num">'+esc(numDisplay)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
+      return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
         '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · '+esc(i.adults)+' adults · '+esc(i.days)+' days</div>'+
         (i.hotelsText?'<div class="sub">'+esc(i.hotelsText)+'</div>':'')+'</div>'+
         '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">Open</button>'+
@@ -325,16 +327,19 @@ function pairsHTML(key){
 function fld(label,id,f,type,extra){
   return '<div><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+(type||'text')+'" data-f="'+f+'" value="'+esc(S.draft[f])+'" '+(extra||'')+'></div>';
 }
+function selFld(label,id,f,list,ph){
+  var cur=S.draft[f]||'',opts=list.slice();if(cur&&opts.indexOf(cur)<0)opts.unshift(cur);
+  return '<div><label for="'+id+'">'+label+'</label><select id="'+id+'" data-f="'+f+'"><option value="">'+ph+'</option>'+opts.map(function(o){return '<option'+(o===cur?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select></div>';
+}
 function area(label,id,f,kind,rows){
   return '<div><div class="snip"><label for="'+id+'">'+label+'</label>'+(kind?snipSelect(f,kind):'')+'</div><textarea id="'+id+'" data-f="'+f+'" rows="'+(rows||4)+'">'+esc(S.draft[f])+'</textarea></div>';
 }
 VIEWS.editor={
   mount:function(){
     var d=S.draft;if(!d){go('list');return}
-    var numDisplay = String(d.number == null ? '' : d.number).padStart(4, '0');
     var hotelNames=S.hotels.slice().sort(byName).map(function(h){return '<option value="'+esc(h.name)+'">'}).join('');
     main().innerHTML=
-     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(numDisplay):'New itinerary')+'</h1><div class="actions">'+
+     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(d.number):'New itinerary')+'</h1><div class="actions">'+
        '<button class="btn" data-act="back">Back</button>'+
        '<button class="btn" data-act="print">Print / Save as PDF</button>'+
        '<button class="btn" data-act="download">Download .html</button>'+
@@ -343,7 +348,7 @@ VIEWS.editor={
        '<button class="btn primary" data-act="save">Save</button></div></div>'+
      '<datalist id="hotelNames">'+hotelNames+'</datalist>'+
      '<div class="split"><div class="stack" id="form">'+
-       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','text')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
+       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','number')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
          fld('Guest name','f-guest','guestName')+
          '<div class="grid3">'+fld('Arrival date','f-arr','arrival','date')+fld('Departure date','f-dep','departure','date')+fld('Adults (>120 cm)','f-adults','adults','number','min="1"')+'</div></section>'+
        '<section class="card stack"><div class="head" style="margin:0"><h2>Daily program</h2><button class="btn small" data-act="genDays">Set days from dates</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ Add day</button></div></section>'+
@@ -351,7 +356,7 @@ VIEWS.editor={
        '<section class="card stack"><h2>Hotels</h2><div id="hotels">'+pairsHTML('hotels')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ Add hotel</button></div>'+
          area('Hotel booking conditions','f-hc','hotelCond','hotelCond',6)+'</section>'+
        '<section class="card stack"><h2>Meals & other</h2>'+area('Meals','f-meals','meals','meals',4)+
-         '<div class="grid2">'+fld('Free Thailand Data Sim Cards','f-sim','sim')+fld('Booking Agent','f-agent','agent')+'</div>'+
+         '<div class="grid2">'+fld('Free Thailand Data Sim Cards','f-sim','sim')+selFld('Booking Agent','f-agent','agent',AGENTS,'Select agent')+'</div>'+
          area('Terms & Conditions','f-terms','terms','terms',5)+'</section>'+
      '</div><div class="preview-col"><div class="scroll-x" id="preview"></div></div></div>';
     this.preview();
@@ -396,17 +401,20 @@ VIEWS.tours=makeLib('tours');VIEWS.hotels=makeLib('hotels');VIEWS.snippets=makeL
 
 /* ---------- actions ---------- */
 function guard(fn){
-  if(S.saving)return;S.saving=true;
-  Promise.resolve().then(fn).catch(function(e){toast('Failed: '+(e&&e.message||'please try again'))}).then(function(){S.saving=false});
+  if(S.saving){toast('Please wait, still working…');return}S.saving=true;
+  Promise.resolve().then(fn).catch(function(e){toast('Failed: '+(e&&e.message||'please try again'),e&&e.status===409?7000:4000)}).then(function(){S.saving=false});
 }
-function openDraft(d,id){S.draft=d;S.editId=id||null;S.delArmed=false;S.view='editor';render();window.scrollTo(0,0)}
+function openDraft(d,id){S.draft=d;S.editId=id||null;S.delArmed=false;S.dirty=false;S.view='editor';render();window.scrollTo(0,0)}
+function touch(){S.dirty=true;VIEWS.editor.preview()}
 function genDays(){
   var a=parseD(S.draft.arrival),b=parseD(S.draft.departure);
   if(!a||!b||b<a){toast('Enter valid arrival and departure dates first');return}
   var n=Math.min(Math.round((b-a)/864e5)+1,30);
+  var lost=S.draft.days.slice(Math.max(n,1)).filter(function(x){return x.text.trim()}).length;
+  if(lost&&!window.confirm('This removes '+lost+' day(s) that already have text. Continue?'))return;
   while(S.draft.days.length<n)S.draft.days.push({text:''});
   S.draft.days.length=Math.max(n,1);
-  $('#days').innerHTML=daysHTML();VIEWS.editor.preview();
+  $('#days').innerHTML=daysHTML();touch();
 }
 function refreshPairs(key){$('#'+key).innerHTML=pairsHTML(key)}
 
@@ -414,45 +422,41 @@ document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]');if(g){go(g.getAttribute('data-go'));return}
   var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   var a=b.getAttribute('data-act'),i=+b.getAttribute('data-i'),id=b.getAttribute('data-id'),key=b.getAttribute('data-key');
-  if(a==='new'){openDraft(newDraft(),null)}
-  else if(a==='open'){guard(function(){return api('GET','/api/itineraries/'+id).then(function(d){openDraft(d,id)})})}
-  else if(a==='dup'){guard(function(){return api('GET','/api/itineraries/'+id).then(function(d){d.number=nextNumber();d.issueDate=today();d.guestName='';openDraft(d,null)})})}
+  if(a==='new'){guard(function(){return ensureReady().then(function(){openDraft(newDraft(),null)})})}
+  else if(a==='open'){guard(function(){return ensureReady().then(function(){return api('GET','/api/itineraries/'+id)}).then(function(d){openDraft(d,id)})})}
+  else if(a==='dup'){guard(function(){return ensureReady().then(function(){return api('GET','/api/itineraries/'+id)}).then(function(d){delete d._rev;d.number=nextNumber();d.issueDate=today();d.guestName='';openDraft(d,null)})})}
   else if(a==='back'){go('list')}
-  else if(a==='addDay'){S.draft.days.push({text:''});$('#days').innerHTML=daysHTML();VIEWS.editor.preview()}
-  else if(a==='rmDay'){S.draft.days.splice(i,1);$('#days').innerHTML=daysHTML();VIEWS.editor.preview()}
+  else if(a==='addDay'){S.draft.days.push({text:''});$('#days').innerHTML=daysHTML();touch()}
+  else if(a==='rmDay'){if(S.draft.days[i].text.trim()&&!window.confirm('Remove Day '+(i+1)+' and its text?'))return;S.draft.days.splice(i,1);$('#days').innerHTML=daysHTML();touch()}
   else if(a==='genDays'){genDays()}
   else if(a==='addTour'){
     var sel=$('[data-tour="'+i+'"]');var t=S.tours.filter(function(x){return x.id===(sel&&sel.value)})[0];
     if(!t){toast('Choose a tour first');return}
     var line=t.name+(t.note?' '+t.note:'');var cur=S.draft.days[i].text.replace(/\s+$/,'');
-    S.draft.days[i].text=(cur?cur+'\n':'')+line;$('#days').innerHTML=daysHTML();VIEWS.editor.preview();
+    S.draft.days[i].text=(cur?cur+'\n':'')+line;$('#days').innerHTML=daysHTML();touch();
   }
-  else if(a==='addPair'){S.draft[key].push({k:'',v:''});refreshPairs(key)}
-  else if(a==='rmPair'){S.draft[key].splice(i,1);refreshPairs(key);VIEWS.editor.preview()}
+  else if(a==='addPair'){S.draft[key].push({k:'',v:''});S.dirty=true;refreshPairs(key)}
+  else if(a==='rmPair'){S.draft[key].splice(i,1);refreshPairs(key);touch()}
   else if(a==='save'){guard(function(){
-    var d=clone(S.draft);
-    var parsedNum = parseInt(d.number, 10);
-    d.number = isNaN(parsedNum) ? d.number : parsedNum;
-    d.adults = +d.adults || 0;
-    var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id});
-    return req.then(function(){
+    var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;
+    var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id;return r});
+    return req.then(function(r){
+      S.draft._rev=r._rev;S.dirty=false;
       toast('Saved to Notion');
-      var numDisplay = String(d.number == null ? '' : d.number).padStart(4, '0');
-      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+numDisplay;
+      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+d.number;
       var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='Delete itinerary';act.insertBefore(nb,pr)}
       loadKind('itineraries');
     });
   })}
   else if(a==='delete'){
     if(!S.delArmed){S.delArmed=true;b.textContent='Click again to confirm';setTimeout(function(){S.delArmed=false;if(b.isConnected)b.textContent='Delete itinerary'},4000)}
-    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('Deleted');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list')})})
+    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('Deleted');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list',true)})})
   }
   else if(a==='print'){window.print()}
   else if(a==='download'){
     var d2=S.draft;var blob=new Blob([fullHTML(d2,company())],{type:'text/html'});
     var url=URL.createObjectURL(blob);var lk=document.createElement('a');
-    var numStr = String(d2.number == null ? '' : d2.number).padStart(4, '0');
-    lk.href=url;lk.download='Itinerary-'+numStr+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html';
+    lk.href=url;lk.download='Itinerary-'+d2.number+'-'+String(d2.guestName||'guest').replace(/[^A-Za-z0-9ก-๙]+/g,'_')+'.html';
     document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
   }
   else if(a==='copy'){
@@ -493,16 +497,20 @@ document.addEventListener('input',function(e){
   else if(t.hasAttribute('data-day')){S.draft.days[+t.getAttribute('data-day')].text=t.value}
   else if(t.hasAttribute('data-pair')){S.draft[t.getAttribute('data-pair')][+t.getAttribute('data-i')][t.getAttribute('data-k')]=t.value}
   else return;
+  S.dirty=true;
   cancelAnimationFrame(S.raf);S.raf=requestAnimationFrame(function(){VIEWS.editor.preview()});
 });
 document.addEventListener('change',function(e){
   var t=e.target;
   if(t.hasAttribute('data-snip')){
     var s=S.snippets.filter(function(x){return x.id===t.value})[0];if(!s)return;
-    var f=t.getAttribute('data-snip');S.draft[f]=s.body||'';
-    var ta=$('[data-f="'+f+'"]');if(ta)ta.value=S.draft[f];t.value='';VIEWS.editor.preview();
+    var f=t.getAttribute('data-snip');
+    if(S.draft[f]&&S.draft[f].trim()&&S.draft[f]!==s.body&&!window.confirm('Replace the current text with this standard text?')){t.value='';return}
+    S.draft[f]=s.body||'';
+    var ta=$('[data-f="'+f+'"]');if(ta)ta.value=S.draft[f];t.value='';touch();
   }
 });
+window.addEventListener('beforeunload',function(e){if(S.view==='editor'&&S.dirty){e.preventDefault();e.returnValue=''}});
 window.addEventListener('hashchange',function(){
   var h=location.hash.slice(1);if(VIEWS[h]&&h!=='editor'&&h!==S.view){S.view=h;render()}
 });

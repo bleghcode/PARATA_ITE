@@ -103,11 +103,19 @@ function itinProps(d) {
   };
 }
 
-function itinBlocks(d) {
-  return pieces(JSON.stringify(d)).map((p) => ({
+// Each save writes its own set of code blocks, tagged with a revision number in the block caption ("rev:3").
+// Reading always uses the newest revision that parses, so a half-finished save can never hide the last good copy.
+function itinBlocks(d, rev) {
+  const parts = pieces(JSON.stringify(d));
+  if (parts.length > 100) throw err('This itinerary is too large to save', 413);
+  return parts.map((p) => ({
     object: 'block',
     type: 'code',
-    code: { language: 'json', rich_text: [{ type: 'text', text: { content: p } }] },
+    code: {
+      language: 'json',
+      rich_text: [{ type: 'text', text: { content: p } }],
+      caption: [{ type: 'text', text: { content: 'rev:' + rev } }],
+    },
   }));
 }
 
@@ -131,33 +139,61 @@ export async function listItins(env) {
   return pages.filter((p) => !p.archived).map(itinSummary);
 }
 
+// Reads the page body and groups code blocks by revision (blocks without a caption count as revision 0).
+async function readStored(env, id) {
+  const blocks = await childBlocks(env, id);
+  const groups = new Map();
+  for (const b of blocks) {
+    if (b.type !== 'code') continue;
+    const m = /^rev:(\d+)$/.exec(plain(b.code.caption));
+    const rev = m ? Number(m[1]) : 0;
+    let g = groups.get(rev);
+    if (!g) { g = { rev, text: '' }; groups.set(rev, g); }
+    g.text += plain(b.code.rich_text);
+  }
+  // newest first; the first group that parses is the current copy
+  let current = null;
+  for (const g of [...groups.values()].sort((a, b) => b.rev - a.rev)) {
+    try { current = { rev: g.rev, data: JSON.parse(g.text) }; break; } catch (e) { /* try the next older copy */ }
+  }
+  return { blocks, current };
+}
+
 export async function getItin(env, id) {
   checkId(id);
-  const blocks = await childBlocks(env, id);
-  const json = blocks
-    .filter((b) => b.type === 'code')
-    .map((b) => plain(b.code.rich_text))
-    .join('');
-  if (!json) throw err('This page has no itinerary data', 404);
-  return JSON.parse(json);
+  const { current } = await readStored(env, id);
+  if (!current) throw err('This page has no readable itinerary data', 404);
+  return { ...current.data, _rev: current.rev };
 }
 
 export async function createItin(env, d) {
+  const data = { ...d, _rev: 1 };
+  const blocks = itinBlocks(data, 1);
   const page = await notion(env, 'POST', '/pages', {
     parent: { database_id: need(env, 'NOTION_ITIN_DB') },
-    properties: itinProps(d),
-    children: itinBlocks(d).slice(0, 100),
+    properties: itinProps(data),
+    children: blocks,
   });
-  return { id: page.id };
+  return { id: page.id, _rev: 1 };
 }
 
 export async function updateItin(env, id, d) {
   checkId(id);
-  await notion(env, 'PATCH', '/pages/' + id, { properties: itinProps(d) });
-  const old = await childBlocks(env, id);
-  await notion(env, 'PATCH', '/blocks/' + id + '/children', { children: itinBlocks(d).slice(0, 100) });
-  for (const b of old) await notion(env, 'DELETE', '/blocks/' + b.id);
-  return { id };
+  const { blocks: old, current } = await readStored(env, id);
+  // Refuse to overwrite a newer save by someone else. If the stored copy is unreadable, allow the save (it repairs the page).
+  if (current && current.rev !== Number(d._rev || 0)) {
+    throw err('This itinerary was changed by someone else. Reload it before saving.', 409);
+  }
+  const rev = (current ? current.rev : Number(d._rev || 0)) + 1;
+  const data = { ...d, _rev: rev };
+  const blocks = itinBlocks(data, rev);
+  // 1) add the new copy, 2) update the columns, 3) remove the old copy. A failure at any step leaves a readable page.
+  await notion(env, 'PATCH', '/blocks/' + id + '/children', { children: blocks });
+  await notion(env, 'PATCH', '/pages/' + id, { properties: itinProps(data) });
+  for (const b of old) {
+    try { await notion(env, 'DELETE', '/blocks/' + b.id); } catch (e) { /* leftover old blocks are ignored on read and removed on the next save */ }
+  }
+  return { id, _rev: rev };
 }
 
 export async function deleteItin(env, id) {

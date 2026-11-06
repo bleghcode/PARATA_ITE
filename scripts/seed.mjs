@@ -33,9 +33,9 @@ const meals = 'Booked with BB Basis: Your reservation includes breakfast. Not In
 const terms = 'Terms & Conditions\ncancellation policy - Our establishment operates under a 72-hour advance cancellation policy. This means that should you need to adjust or cancel your reservation, we kindly ask for notification at least 72 hours prior to the scheduled time. This policy allows us to manage our resources effectively and accommodate other guests efficiently. We appreciate your understanding and cooperation in helping us maintain the highest level of service for all our patrons.';
 
 const snippets = [
-  { title: 'เงื่อนไขการจองโรงแรม (มาตรฐาน)', kind: 'hotelCond', body: hotelCond },
-  { title: 'มื้ออาหาร BB + ฟรี 1 มื้อที่ร้าน Siam Ceylon', kind: 'meals', body: meals },
-  { title: 'Terms & Conditions (ยกเลิก 72 ชั่วโมง)', kind: 'terms', body: terms },
+  { title: 'Hotel booking conditions (standard)', kind: 'hotelCond', body: hotelCond },
+  { title: 'Meals: BB + one free meal at Siam Ceylon', kind: 'meals', body: meals },
+  { title: 'Terms & Conditions (72-hour cancellation)', kind: 'terms', body: terms },
 ];
 
 const sample = {
