@@ -165,7 +165,7 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 
 // PRITE = PARATA Itinerary. Raise this number with every change and note it in CHANGELOG.md.
-var VERSION='PRITE V.1.4.9';
+var VERSION='PRITE V.1.5.0';
 var CO_DEFAULT={brand:'Your Brand',name:'Your Company Co Ltd.',address:'',phones:'',email:'',location:'',regNo:''};
 var TOUR_CATS=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Transfer','Transfer'],['Kanchanaburi','Kanchanaburi'],['Meals','Meals'],['Other','Other']];
 var CITIES=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Other','Other']];
@@ -560,61 +560,208 @@ function genDays(auto){
   S.draft.days.length=Math.max(n,1);
   $('#days').innerHTML=daysHTML();touch();
 }
-// Real PDF download named NAME_DATE_NO.pdf (library loaded on first use from cdnjs)
-function loadPdfLib(){
-  if(window.html2pdf)return Promise.resolve();
-  return new Promise(function(ok,no){
-    var sc=document.createElement('script');
-    sc.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    sc.onload=ok;sc.onerror=function(){no(new Error('Could not load the PDF tool. Check the internet connection, or use Print.'))};
-    document.head.appendChild(sc);
-  });
+/* ---------- PDF (built right here in the browser, no outside library) ---------- */
+var PDF_W=595.28,PDF_H=841.89,PDF_M=36;
+var WIN1252={0x2022:0x95,0x2013:0x96,0x2014:0x97,0x2018:0x91,0x2019:0x92,0x201C:0x93,0x201D:0x94,0x2026:0x85,0x20AC:0x80,0x2122:0x99};
+var PDF_FONTS={F1:{n:'Helvetica'},F2:{n:'Helvetica-Bold',bold:1},F3:{n:'Times-BoldItalic',serif:1,bold:1,italic:1},F4:{n:'Helvetica-Oblique',italic:1}};
+var _mctx=null;
+function pdfWidth(s,f,size){
+  if(!_mctx)_mctx=document.createElement('canvas').getContext('2d');
+  var F=PDF_FONTS[f];
+  _mctx.font=(F.italic?'italic ':'')+(F.bold?'bold ':'')+'100px '+(F.serif?'"Times New Roman",Times,"Liberation Serif",serif':'Arial,Helvetica,"Liberation Sans",Arimo,sans-serif');
+  return _mctx.measureText(s).width*size/100;
 }
+function pdfCodes(s,st){
+  var out=[];
+  for(var i=0;i<s.length;i++){
+    var c=s.charCodeAt(i),b;
+    if(c>=32&&c<127)b=c;else if(c===0xa0||c===9)b=32;else if(c>=0xa1&&c<=0xff)b=c;else if(WIN1252[c])b=WIN1252[c];
+    else{b=63;if(st&&c>32)st.bad++}
+    out.push(b);
+  }
+  return out;
+}
+function pdfHex(a){var h='';for(var i=0;i<a.length;i++)h+=('0'+a[i].toString(16)).slice(-2);return h}
+function pdfColor(h){h=h.replace('#','');return [0,2,4].map(function(i){return (parseInt(h.substr(i,2),16)/255).toFixed(3)}).join(' ')}
+// size of a JPEG: [width,height,components] (null if it is not a plain JPEG)
+function jpegInfo(b){
+  if(!b||b[0]!==0xff||b[1]!==0xd8)return null;
+  var i=2;
+  while(i+9<b.length){
+    if(b[i]!==0xff){i++;continue}
+    var m=b[i+1];
+    if(m>=0xc0&&m<=0xcf&&m!==0xc4&&m!==0xc8&&m!==0xcc)return [b[i+7]*256+b[i+8],b[i+5]*256+b[i+6],b[i+9]];
+    i+=2+b[i+2]*256+b[i+3];
+  }
+  return null;
+}
+function buildPdf(d,c,jpg){
+  var st={bad:0},pages=[],ops,y,CW=PDF_W-2*PDF_M,X0=PDF_M;
+  var info=jpegInfo(jpg);if(info&&info[2]!==1&&info[2]!==3)info=null;
+  function newPage(){ops=[];pages.push(ops);y=PDF_M}
+  function ensure(h){if(y+h>PDF_H-PDF_M)newPage()}
+  function txt(s,x,top,f,size,color,align){
+    if(!s)return;
+    var xx=x;if(align==='r')xx=x-pdfWidth(s,f,size);else if(align==='c')xx=x-pdfWidth(s,f,size)/2;
+    ops.push('BT /'+f+' '+size+' Tf '+pdfColor(color)+' rg '+xx.toFixed(2)+' '+(PDF_H-top-size*0.8).toFixed(2)+' Td <'+pdfHex(pdfCodes(s,st))+'> Tj ET');
+  }
+  function fillRect(x,top,w,h,color){ops.push(pdfColor(color)+' rg '+x.toFixed(2)+' '+(PDF_H-top-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re f')}
+  function boxRect(x,top,w,h,color){ops.push('[] 0 d '+pdfColor(color)+' RG 0.5 w '+x.toFixed(2)+' '+(PDF_H-top-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re S')}
+  function hline(top,color,wd,dash){ops.push((dash?'['+dash+'] 0 d ':'[] 0 d ')+pdfColor(color)+' RG '+wd+' w '+X0+' '+(PDF_H-top).toFixed(2)+' m '+(X0+CW).toFixed(2)+' '+(PDF_H-top).toFixed(2)+' l S')}
+  // word wrap; \n starts a new line
+  function wrap(s,f,size,maxW){
+    var out=[];
+    String(s==null?'':s).split('\n').forEach(function(par){
+      par=par.replace(/\s+$/,'');
+      if(!par){out.push('');return}
+      var cur='';
+      par.split(' ').forEach(function(w){
+        var t=cur?cur+' '+w:w;
+        if(pdfWidth(t,f,size)<=maxW){cur=t;return}
+        if(cur){out.push(cur);cur=''}
+        while(pdfWidth(w,f,size)>maxW&&w.length>1){
+          var k=w.length;while(k>1&&pdfWidth(w.slice(0,k),f,size)>maxW)k--;
+          out.push(w.slice(0,k));w=w.slice(k);
+        }
+        cur=w;
+      });
+      out.push(cur);
+    });
+    return out;
+  }
+  function row(k,v){
+    var size=9.5,lead=13,vx=X0+CW*0.4,ls=wrap(v,'F1',size,CW*0.6-4);
+    ensure(ls.length*lead+6);
+    txt(k,X0,y+3,'F1',size,'#2b3350');
+    ls.forEach(function(l,i){txt(l,vx,y+3+i*lead,'F1',size,'#0e1530')});
+    y+=ls.length*lead+6;
+  }
+  function rule(){y+=7;ensure(2);hline(y,'#b8c0d4',0.6,'3 2');y+=9}
+  function block(s,f,size,color,lead){
+    wrap(s,f,size,CW).forEach(function(l){ensure(lead);txt(l,X0,y,f,size,color);y+=lead});
+  }
+
+  newPage();
+  // top: brand + issue date / number
+  txt(c.brand,X0,y,'F3',24,'#2557c7');
+  txt(fmtDate(d.issueDate),X0+CW,y,'F1',8.5,'#4a5470','r');
+  txt('Itinerary Number',X0+CW,y+12,'F2',9,'#0e1530','r');
+  txt(String(d.number==null?'':d.number),X0+CW,y+23,'F2',9,'#0e1530','r');
+  y+=40;
+  // company band with the banner picture behind the text
+  var bh=CW*189/898;
+  if(info)ops.push('q '+CW.toFixed(2)+' 0 0 '+bh.toFixed(2)+' '+X0+' '+(PDF_H-y-bh).toFixed(2)+' cm /Im1 Do Q');
+  else fillRect(X0,y,CW,bh,'#f1f5fc');
+  var bl=[c.address,c.phones?'Phone '+c.phones:'',c.email?'Email '+c.email:'',c.location].filter(Boolean);
+  var bt=y+Math.max(6,(bh-(15*1.25+8+bl.length*13))/2);
+  txt(c.name,X0+16,bt,'F2',15,'#1b3f8f');
+  bl.forEach(function(l,i){txt(l,X0+16,bt+15*1.25+8+i*13,'F2',8.5,'#000000')});
+  y+=bh+10;
+  // title
+  hline(y,'#2e8fd6',0.8);txt('Travel Itinerary',X0,y+7,'F2',13,'#0e1530');hline(y+27,'#2e8fd6',0.8);y+=33;
+  row('Guest Name',guestFull(d));row('Arrival Date',fmtDate(d.arrival));row('Departure Date',fmtDate(d.departure));
+  row('Number of Adults(>120cm)',String(d.adults==null?'':d.adults));
+  if(+d.child)row('Number of Children',String(d.child));
+  if(+d.infant)row('Number of Infants',String(d.infant));
+  rule();
+  // days
+  var TW=88,ax=X0+TW+8,aw=CW-TW-8;
+  (d.days||[]).forEach(function(day,i){
+    ensure(34);
+    txt(dayLabel(d,i),X0,y,'F2',10,'#0e1530');y+=16;
+    var prev='';
+    parseDay(day.text).forEach(function(r){
+      var lead=12.5,size=9.5,tl=[],xl,bx=ax,mark='•';
+      if(r.sub){bx=ax+16;mark='-'}
+      if(r.label&&r.label!==prev){ensure(lead);txt(r.label,X0,y,'F1',size,'#2b3350');y+=lead}
+      if(!r.sub)prev=r.time?r.label:'';
+      tl=wrap(r.time||'','F1',size,TW);
+      xl=wrap(r.text,'F1',size,aw-(bx-ax)-10);
+      var n=Math.max(tl.length,xl.length,1);
+      ensure(n*lead+2);
+      tl.forEach(function(l,k){txt(l,X0,y+k*lead,'F1',size,'#2b3350')});
+      txt(mark,bx,y,'F1',size,'#0e1530');
+      xl.forEach(function(l,k){txt(l,bx+10,y+k*lead,'F1',size,'#0e1530')});
+      y+=n*lead+2;
+    });
+    y+=12;
+  });
+  var tr=(d.transport||[]).filter(function(p){return p.k||p.v}),ho=(d.hotels||[]).filter(function(p){return p.v});
+  if(tr.length){rule();tr.forEach(function(p){row(p.k,p.v)})}
+  if(ho.length){rule();ho.forEach(function(p){row(p.k+' Hotel',p.v)})}
+  if(d.hotelCond){y+=6;block(d.hotelCond,'F4',8.5,'#3b4460',11)}
+  // guest list table
+  var gl=memberList(d);
+  if(gl.length){
+    rule();ensure(60);txt('Guest List',X0,y,'F2',10,'#0e1530');y+=17;
+    var cw=[34,CW-34-170,170],size=9.5,lead=12.5;
+    var cells=function(a,bold,fill){
+      var parts=a.map(function(t,k){return wrap(t,bold?'F2':'F1',size,cw[k]-12)});
+      var n=Math.max(parts[0].length,parts[1].length,parts[2].length,1),h=n*lead+8;
+      ensure(h);
+      if(fill)fillRect(X0,y,CW,h,fill);
+      var x=X0;
+      for(var k=0;k<3;k++){
+        boxRect(x,y,cw[k],h,'#b8c0d4');
+        parts[k].forEach(function(l,j){txt(l,k===0?x+cw[0]/2:x+6,y+4+j*lead,bold?'F2':'F1',size,'#0e1530',k===0?'c':'l')});
+        x+=cw[k];
+      }
+      y+=h;
+    };
+    cells(['No.','Name','Passport No.'],true,'#f1f5fc');
+    gl.forEach(function(g,i){cells([String(i+1),g.n||'',g.p||''],false)});
+    y+=4;
+  }
+  if(d.meals){rule();row('Meals',d.meals)}
+  if(d.sim){rule();row('Free Thailand Data Sim Cards',d.sim)}
+  if(d.agent){rule();row('Booking Agent',d.agent)}
+  if(d.terms){y+=8;block(d.terms,'F1',8.5,'#555d75',11)}
+  y+=10;ensure(30);
+  txt('Thank you for choosing '+c.brand+'!',X0+CW/2,y,'F2',10.5,'#3b4460','c');y+=16;
+  if(c.regNo){var rl=wrap(c.regNo,'F1',8.5,CW);rl.forEach(function(l){ensure(11);txt(l,X0+CW/2,y,'F1',8.5,'#555d75','c');y+=11})}
+
+  // assemble the file
+  var chunks=[],pos=0,offs=[];
+  function bytes(s){var a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&255;return a}
+  function put(x){var b=typeof x==='string'?bytes(x):x;chunks.push(b);pos+=b.length}
+  function obj(n,body){offs[n]=pos;put(n+' 0 obj\n'+body+'\nendobj\n')}
+  var nPages=pages.length,imgN=info?7:0,first=info?8:7,kids=[];
+  put('%PDF-1.4\n%\xe2\xe3\xcf\xd3\n');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  for(var p=0;p<nPages;p++)kids.push((first+p*2)+' 0 R');
+  obj(2,'<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+nPages+' >>');
+  ['F1','F2','F3','F4'].forEach(function(f,i){obj(3+i,'<< /Type /Font /Subtype /Type1 /BaseFont /'+PDF_FONTS[f].n+' /Encoding /WinAnsiEncoding >>')});
+  if(info){
+    offs[7]=pos;
+    put('7 0 obj\n<< /Type /XObject /Subtype /Image /Width '+info[0]+' /Height '+info[1]+' /ColorSpace /'+(info[2]===1?'DeviceGray':'DeviceRGB')+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+jpg.length+' >>\nstream\n');
+    put(jpg);put('\nendstream\nendobj\n');
+  }
+  var res='<< /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >>'+(info?' /XObject << /Im1 7 0 R >>':'')+' >>';
+  pages.forEach(function(o,i){
+    var pn=first+i*2,cn=pn+1,s=o.join('\n');
+    obj(pn,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PDF_W+' '+PDF_H+'] /Resources '+res+' /Contents '+cn+' 0 R >>');
+    obj(cn,'<< /Length '+s.length+' >>\nstream\n'+s+'\nendstream');
+  });
+  var total=first+nPages*2;
+  obj(total,'<< /Title ('+fileBase(d).replace(/[^\x20-\x7e]/g,'').replace(/[()\\]/g,'')+') /Producer (PRITE) >>');
+  var xr=pos,x='xref\n0 '+(total+1)+'\n0000000000 65535 f \n';
+  for(var n=1;n<=total;n++)x+=('0000000000'+(offs[n]||0)).slice(-10)+' 00000 n \n';
+  put(x+'trailer\n<< /Size '+(total+1)+' /Root 1 0 R /Info '+total+' 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+  var out=new Uint8Array(pos),at=0;chunks.forEach(function(b){out.set(b,at);at+=b.length});
+  return {bytes:out,bad:st.bad,pages:nPages};
+}
+// One-click PDF named NAME_DD_DD_MM_NO.pdf
 function downloadPDF(btn){
   var d=clone(S.draft),name=fileBase(d)+'.pdf',old=btn.textContent;
   btn.disabled=true;btn.textContent='Making PDF…';
-  
-  // 1. โหลดรูปภาพ Banner ให้เป็นข้อมูล Base64 ก่อน
-  bandData().then(function(band){
-    var host=document.createElement('div');
-    host.style.cssText='display:block; width:794px; background:#ffffff; position:absolute; left:-9999px; top:0;';
-    
-    var fixCSS = 'body{background:#fff!important;} .sheet{border:0!important;border-radius:0!important;max-width:100%!important;margin:0!important;padding:20px!important;}';
-    
-    // 2. นำ Base64 มายัดใส่ CSS แทน URL รูปภาพเดิม
-    var css = $('#paper-css').textContent.split(BAND_URL).join(band||BAND_URL);
-    host.innerHTML='<style>'+css + fixCSS + '</style>'+docHTML(d,company());
-    document.body.appendChild(host); 
-    
-    return loadPdfLib().then(function(){
-      return window.html2pdf().set({
-        margin: [15, 0, 15, 0], // ขยายขอบกระดาษบนล่าง ป้องกันเนื้อหาชิดขอบเกินไป
-        filename: name,
-        image: {type:'jpeg', quality: 0.98},
-        html2canvas: {
-          scale: 2, 
-          useCORS: true, 
-          backgroundColor: '#ffffff',
-          windowWidth: 794
-        },
-        jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
-        // 3. อัปเดตรายชื่อ Class ทั้งหมด (ตาราง, แถว, บรรทัด) เพื่อสั่งไม่ให้มันหั่นขาดครึ่ง
-        pagebreak: {mode:['css','legacy'], avoid:['h4','.p-row','li','.p-day','.p-ln','tr','.p-gl-title','.p-band']}
-      }).from(host).save();
-    }).then(function(){
-      toast('Downloaded '+name);
-    }).catch(function(e){
-      toast('PDF failed: '+(e&&e.message||'try Print instead'),6000);
-    }).then(function(){
-      host.remove(); 
-      btn.disabled=false;
-      btn.textContent=old;
-    });
-  }).catch(function(e){
-    toast('PDF failed: Could not process image.', 6000);
-    btn.disabled=false;
-    btn.textContent=old;
-  });
+  fetch(BAND_URL).then(function(r){return r.ok?r.arrayBuffer():null}).catch(function(){return null}).then(function(buf){
+    var r=buildPdf(d,company(),buf?new Uint8Array(buf):null);
+    var url=URL.createObjectURL(new Blob([r.bytes],{type:'application/pdf'}));
+    var lk=document.createElement('a');lk.href=url;lk.download=name;
+    document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},2000);
+    toast(r.bad?'Downloaded '+name+'. '+r.bad+' character(s) such as Thai letters cannot be shown in the PDF and appear as ?':'Downloaded '+name,r.bad?7000:2600);
+  }).catch(function(e){toast('PDF failed: '+(e&&e.message||'try Print instead'),6000)})
+  .then(function(){btn.disabled=false;btn.textContent=old});
 }
 function refreshPairs(key){$('#'+key).innerHTML=pairsHTML(key)}
 

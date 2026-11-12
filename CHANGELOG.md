@@ -2,6 +2,14 @@
 
 Version format: `PRITE V.major.minor.patch`. The current version is also shown in the page header and in `VERSION` near the top of `index.html`.
 
+## V.1.5.0 – 2026-11-12
+- Fixed: "Download PDF" produced a blank white PDF. Cause: the old method took a picture of the web page with a third-party tool (html2pdf / html2canvas, loaded from the internet) and that picture came out empty (the blank file contained no image and no text). That tool is removed.
+- New: the PDF is now built by PRITE itself, directly in the browser, with no outside library and no internet needed. One click on "Download PDF" saves the file immediately, named `NAME_DD_DD_MM_NO.pdf`.
+- The PDF has the same content as the paper preview: brand, issue date and number, the banner band, guest rows, day pages with the time column, transport, hotels, hotel conditions, guest list table with passport numbers, meals, SIM, booking agent, terms. Text is real text (selectable and searchable); long itineraries continue on extra pages.
+- Limitation: the PDF uses standard Helvetica/Times fonts, so characters outside Latin letters (for example Thai) cannot be shown; they appear as "?" and a warning is shown after download. Use Print > Save as PDF if Thai text is needed.
+- Print and Download .html are unchanged.
+- Files changed: `index.html`, `CHANGELOG.md`.
+
 ## V.1.4.9 – 2026-11-11
 - Booking agents can now be added from the web: on the Standard text page add an item of type "Booking agent" (the Title is the person's name). It appears in the Booking Agent dropdown for everyone. Names in the `AGENTS` list in `index.html` still work.
 - Download PDF: attempted fix for a blank (white) PDF. The page is now rendered from the top of the window with the scroll position ignored, then the scroll position is restored. Not verified in a real browser; if the PDF is still blank, use Print > Save as PDF, which has the same automatic file name.
