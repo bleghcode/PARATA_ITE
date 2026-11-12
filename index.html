@@ -108,6 +108,9 @@ label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
 .sheet .p-band{margin:14px 0 0;padding:10px 24px;background:#fffafa url(/assets/header-band.jpg) center/100% 100% no-repeat;aspect-ratio:898/189;display:flex;flex-direction:column;justify-content:center}
 .sheet .p-band h2{margin:0 0 10px;font:700 22px/1.2 'Roboto',Arial,sans-serif;color:#1b3f8f}
 .sheet .p-band p{margin:2px 0;font-size:12px;font-weight:600;color:#000}
+.sheet .p-days{position:relative;isolation:isolate}
+.sheet .p-days::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(/assets/day-watermark.jpg) var(--wm-x,100%) var(--wm-y,55%)/var(--wm-s,100%) auto no-repeat;opacity:var(--wm-o,.4)}
+.sheet .p-band,.sheet .p-days,.sheet .p-days::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .sheet .p-title{margin:16px 0 8px;padding:8px 0;border-top:1px solid #2e8fd6;border-bottom:1px solid #2e8fd6;font:700 18px/1.2 'Roboto',Arial,sans-serif}
 .sheet .p-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:12px;padding:5px 0}
 .sheet .p-row div:first-child{color:#2b3350}
@@ -165,7 +168,13 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 
 // PRITE = PARATA Itinerary. Raise this number with every change and note it in CHANGELOG.md.
-var VERSION='PRITE V.1.5.0';
+var VERSION='PRITE V.1.5.2';
+// Pattern behind the DAY section (paper preview, print, .html and PDF all use these four numbers):
+//   x = left/right position, 0 = left edge, 100 = right edge
+//   y = up/down position,    0 = top,       100 = bottom      (smaller number = pattern sits lower on the page)
+//   size = width of the picture as % of the section width
+//   opacity = 1 is full strength, 0.4 is 40 % strength, 0 hides it
+var WM={x:100,y:55,size:100,opacity:0.4};
 var CO_DEFAULT={brand:'Your Brand',name:'Your Company Co Ltd.',address:'',phones:'',email:'',location:'',regNo:''};
 var TOUR_CATS=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Transfer','Transfer'],['Kanchanaburi','Kanchanaburi'],['Meals','Meals'],['Other','Other']];
 var CITIES=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Other','Other']];
@@ -288,12 +297,12 @@ function docHTML(d,c){
   var days=(d.days||[]).map(function(x,i){return '<div class="p-day"><h4>'+esc(dayLabel(d,i))+'</h4>'+dayRowsHTML(x.text)+'</div>'}).join('');
   var tr=(d.transport||[]).filter(function(p){return p.k||p.v}).map(function(p){return row(p.k,p.v)}).join('');
   var ho=(d.hotels||[]).filter(function(p){return p.v}).map(function(p){return row(p.k+' Hotel',p.v)}).join('');
-  return '<div class="sheet">'+
+  return '<div class="sheet" style="--wm-x:'+WM.x+'%;--wm-y:'+WM.y+'%;--wm-s:'+WM.size+'%;--wm-o:'+WM.opacity+'">'+
    '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(d.number)+'</b></div></div>'+
    '<div class="p-band"><h2>'+esc(c.name)+'</h2>'+(c.address?'<p>'+esc(c.address)+'</p>':'')+(c.phones?'<p>Phone '+esc(c.phones)+'</p>':'')+(c.email?'<p>Email '+esc(c.email)+'</p>':'')+(c.location?'<p>'+esc(c.location)+'</p>':'')+'</div>'+
    '<div class="p-title">Travel Itinerary</div>'+
    row('Guest Name',guestFull(d))+row('Arrival Date',fmtDate(d.arrival))+row('Departure Date',fmtDate(d.departure))+row('Number of Adults(>120cm)',d.adults)+(+d.child?row('Number of Children',d.child):'')+(+d.infant?row('Number of Infants',d.infant):'')+
-   '<hr class="p-rule">'+days+
+   '<hr class="p-rule"><div class="p-days">'+days+'</div>'+
    (tr?'<hr class="p-rule">'+tr:'')+(ho?'<hr class="p-rule">'+ho:'')+
    (d.hotelCond?'<div class="p-note">'+esc(d.hotelCond)+'</div>':'')+
    membersHTML(d)+
@@ -306,15 +315,18 @@ function docHTML(d,c){
 }
 var BAND_URL='/assets/header-band.jpg';
 // The downloaded .html must work offline, so the banner picture is embedded in it.
-function bandData(){
-  if(bandData.p)return bandData.p;
-  bandData.p=fetch(BAND_URL).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){
-    return new Promise(function(ok){var fr=new FileReader();fr.onload=function(){ok(fr.result)};fr.onerror=function(){ok(BAND_URL)};fr.readAsDataURL(b)});
-  }).catch(function(){return BAND_URL});
-  return bandData.p;
+var WM_URL='/assets/day-watermark.jpg';
+var _assetCache={};
+function assetData(url){
+  if(_assetCache[url])return _assetCache[url];
+  _assetCache[url]=fetch(url).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){
+    return new Promise(function(ok){var fr=new FileReader();fr.onload=function(){ok(fr.result)};fr.onerror=function(){ok(url)};fr.readAsDataURL(b)});
+  }).catch(function(){return url});
+  return _assetCache[url];
 }
-function fullHTML(d,c,band){
-  var css=$('#paper-css').textContent.split(BAND_URL).join(band||BAND_URL);
+function bandData(){return assetData(BAND_URL)}
+function fullHTML(d,c,band,wm){
+  var css=$('#paper-css').textContent.split(BAND_URL).join(band||BAND_URL).split(WM_URL).join(wm||WM_URL);
   return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(fileBase(d))+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+css+'</style></head><body>'+docHTML(d,c)+'</body></html>';
 }
 function textExport(d,c){
@@ -595,9 +607,12 @@ function jpegInfo(b){
   }
   return null;
 }
-function buildPdf(d,c,jpg){
+function buildPdf(d,c,jpg,wm){
   var st={bad:0},pages=[],ops,y,CW=PDF_W-2*PDF_M,X0=PDF_M;
   var info=jpegInfo(jpg);if(info&&info[2]!==1&&info[2]!==3)info=null;
+  var winfo=jpegInfo(wm);if(winfo&&winfo[2]!==1&&winfo[2]!==3)winfo=null;
+  var ranges={};   // per page: where the day section starts and ends (the watermark goes behind it)
+  function markRange(a,b){var k=pages.length-1,r=ranges[k];if(!r)ranges[k]={a:a,b:b};else{r.a=Math.min(r.a,a);r.b=Math.max(r.b,b)}}
   function newPage(){ops=[];pages.push(ops);y=PDF_M}
   function ensure(h){if(y+h>PDF_H-PDF_M)newPage()}
   function txt(s,x,top,f,size,color,align){
@@ -668,21 +683,23 @@ function buildPdf(d,c,jpg){
   var TW=88,ax=X0+TW+8,aw=CW-TW-8;
   (d.days||[]).forEach(function(day,i){
     ensure(34);
-    txt(dayLabel(d,i),X0,y,'F2',10,'#0e1530');y+=16;
+    var t0=y;
+    txt(dayLabel(d,i),X0,y,'F2',10,'#0e1530');y+=16;markRange(t0,y);
     var prev='';
     parseDay(day.text).forEach(function(r){
       var lead=12.5,size=9.5,tl=[],xl,bx=ax,mark='•';
       if(r.sub){bx=ax+16;mark='-'}
-      if(r.label&&r.label!==prev){ensure(lead);txt(r.label,X0,y,'F1',size,'#2b3350');y+=lead}
+      if(r.label&&r.label!==prev){ensure(lead);var l0=y;txt(r.label,X0,y,'F1',size,'#2b3350');y+=lead;markRange(l0,y)}
       if(!r.sub)prev=r.time?r.label:'';
       tl=wrap(r.time||'','F1',size,TW);
       xl=wrap(r.text,'F1',size,aw-(bx-ax)-10);
       var n=Math.max(tl.length,xl.length,1);
       ensure(n*lead+2);
+      var r0=y;
       tl.forEach(function(l,k){txt(l,X0,y+k*lead,'F1',size,'#2b3350')});
       txt(mark,bx,y,'F1',size,'#0e1530');
       xl.forEach(function(l,k){txt(l,bx+10,y+k*lead,'F1',size,'#0e1530')});
-      y+=n*lead+2;
+      y+=n*lead+2;markRange(r0,y);
     });
     y+=12;
   });
@@ -720,23 +737,30 @@ function buildPdf(d,c,jpg){
   txt('Thank you for choosing '+c.brand+'!',X0+CW/2,y,'F2',10.5,'#3b4460','c');y+=16;
   if(c.regNo){var rl=wrap(c.regNo,'F1',8.5,CW);rl.forEach(function(l){ensure(11);txt(l,X0+CW/2,y,'F1',8.5,'#555d75','c');y+=11})}
 
+  // watermark picture behind the day section of each page (same look as the paper preview: right-bottom, cover, clipped)
+  if(winfo)Object.keys(ranges).forEach(function(k){
+    var r=ranges[k],top=r.a-2,H=r.b-top+4,dw=CW*WM.size/100,dh=winfo[1]*dw/winfo[0];
+    var ix=X0+(WM.x/100)*(CW-dw),iy=top+(WM.y/100)*(H-dh),cby=PDF_H-(top+H),iby=PDF_H-(iy+dh);
+    pages[k].unshift('q '+X0+' '+cby.toFixed(2)+' '+CW.toFixed(2)+' '+H.toFixed(2)+' re W n /GS1 gs '+dw.toFixed(2)+' 0 0 '+dh.toFixed(2)+' '+ix.toFixed(2)+' '+iby.toFixed(2)+' cm /Im2 Do Q');
+  });
   // assemble the file
   var chunks=[],pos=0,offs=[];
   function bytes(s){var a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&255;return a}
   function put(x){var b=typeof x==='string'?bytes(x):x;chunks.push(b);pos+=b.length}
   function obj(n,body){offs[n]=pos;put(n+' 0 obj\n'+body+'\nendobj\n')}
-  var nPages=pages.length,imgN=info?7:0,first=info?8:7,kids=[];
+  var imgs=[];if(info)imgs.push({n:'Im1',i:info,b:jpg});if(winfo)imgs.push({n:'Im2',i:winfo,b:wm});
+  var nPages=pages.length,first=7+imgs.length,kids=[];
   put('%PDF-1.4\n%\xe2\xe3\xcf\xd3\n');
   obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
   for(var p=0;p<nPages;p++)kids.push((first+p*2)+' 0 R');
   obj(2,'<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+nPages+' >>');
   ['F1','F2','F3','F4'].forEach(function(f,i){obj(3+i,'<< /Type /Font /Subtype /Type1 /BaseFont /'+PDF_FONTS[f].n+' /Encoding /WinAnsiEncoding >>')});
-  if(info){
-    offs[7]=pos;
-    put('7 0 obj\n<< /Type /XObject /Subtype /Image /Width '+info[0]+' /Height '+info[1]+' /ColorSpace /'+(info[2]===1?'DeviceGray':'DeviceRGB')+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+jpg.length+' >>\nstream\n');
-    put(jpg);put('\nendstream\nendobj\n');
-  }
-  var res='<< /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >>'+(info?' /XObject << /Im1 7 0 R >>':'')+' >>';
+  imgs.forEach(function(m,k){
+    offs[7+k]=pos;
+    put((7+k)+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+m.i[0]+' /Height '+m.i[1]+' /ColorSpace /'+(m.i[2]===1?'DeviceGray':'DeviceRGB')+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+m.b.length+' >>\nstream\n');
+    put(m.b);put('\nendstream\nendobj\n');
+  });
+  var res='<< /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> /ExtGState << /GS1 << /ca '+WM.opacity+' >> >>'+(imgs.length?' /XObject << '+imgs.map(function(m,k){return '/'+m.n+' '+(7+k)+' 0 R'}).join(' ')+' >>':'')+' >>';
   pages.forEach(function(o,i){
     var pn=first+i*2,cn=pn+1,s=o.join('\n');
     obj(pn,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PDF_W+' '+PDF_H+'] /Resources '+res+' /Contents '+cn+' 0 R >>');
@@ -754,8 +778,9 @@ function buildPdf(d,c,jpg){
 function downloadPDF(btn){
   var d=clone(S.draft),name=fileBase(d)+'.pdf',old=btn.textContent;
   btn.disabled=true;btn.textContent='Making PDF…';
-  fetch(BAND_URL).then(function(r){return r.ok?r.arrayBuffer():null}).catch(function(){return null}).then(function(buf){
-    var r=buildPdf(d,company(),buf?new Uint8Array(buf):null);
+  var get=function(u){return fetch(u).then(function(r){return r.ok?r.arrayBuffer():null}).catch(function(){return null})};
+  Promise.all([get(BAND_URL),get(WM_URL)]).then(function(bufs){
+    var r=buildPdf(d,company(),bufs[0]?new Uint8Array(bufs[0]):null,bufs[1]?new Uint8Array(bufs[1]):null);
     var url=URL.createObjectURL(new Blob([r.bytes],{type:'application/pdf'}));
     var lk=document.createElement('a');lk.href=url;lk.download=name;
     document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},2000);
@@ -813,8 +838,8 @@ document.addEventListener('click',function(e){
   }
   else if(a==='download'){
     var d2=clone(S.draft);
-    bandData().then(function(band){
-      var blob=new Blob([fullHTML(d2,company(),band)],{type:'text/html'});
+    Promise.all([bandData(),assetData(WM_URL)]).then(function(a){
+      var blob=new Blob([fullHTML(d2,company(),a[0],a[1])],{type:'text/html'});
       var url=URL.createObjectURL(blob);var lk=document.createElement('a');
       lk.href=url;lk.download=fileBase(d2)+'.html';
       document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);

@@ -2,6 +2,18 @@
 
 Version format: `PRITE V.major.minor.patch`. The current version is also shown in the page header and in `VERSION` near the top of `index.html`.
 
+## V.1.5.2 – 2026-11-12
+- The DAY-section pattern now sits lower on the page and is 60 % fainter (40 % strength).
+- New: the pattern's position, size and strength are set by one line, `var WM={x:100,y:55,size:100,opacity:0.4}` near the top of `index.html`; the preview, Print, .html download and PDF all follow it.
+- Technical: the pattern is now a separate layer (so fading it does not fade the text), and the PDF uses a transparency setting for the same effect.
+- Files changed: `index.html`, `CHANGELOG.md`.
+
+## V.1.5.1 – 2026-11-12
+- New: the company's lion-and-sword pattern is now the background of the DAY section of the paper (right-bottom, covering the section, clipped to it). It appears in the on-screen preview, in Print, in the downloaded .html (embedded, works offline) and in the PDF (drawn behind the day text on every page that has days).
+- The rest of the paper (header, banner, guest rows, transport, hotels, guest list, meals, terms) is unchanged. If `assets/day-watermark.jpg` is missing, the days print on plain white exactly as before.
+- Print now keeps background pictures (the header banner and the pattern) even when "Background graphics" is off in the print window.
+- Files changed: `index.html`, `CHANGELOG.md`; new file: `assets/day-watermark.jpg` (replace this file to change the pattern).
+
 ## V.1.5.0 – 2026-11-12
 - Fixed: "Download PDF" produced a blank white PDF. Cause: the old method took a picture of the web page with a third-party tool (html2pdf / html2canvas, loaded from the internet) and that picture came out empty (the blank file contained no image and no text). That tool is removed.
 - New: the PDF is now built by PRITE itself, directly in the browser, with no outside library and no internet needed. One click on "Download PDF" saves the file immediately, named `NAME_DD_DD_MM_NO.pdf`.
