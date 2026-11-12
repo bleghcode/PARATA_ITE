@@ -2,6 +2,11 @@
 
 Version format: `PRITE V.major.minor.patch`. The current version is also shown in the page header and in `VERSION` near the top of `index.html`.
 
+## V.1.5.2 (docs update) – 2026-11-12
+- Documentation only. `index.html` is unchanged (still PRITE V.1.5.2).
+- New: `CODE_GUIDE.md` (Thai) with a file map, how to adjust spacing on screen/print and in the PDF, a line-by-line explanation of the main code, and common edit recipes.
+- Files changed: `CODE_GUIDE.md`, `CHANGELOG.md`.
+
 ## V.1.5.2 – 2026-11-12
 - The DAY-section pattern now sits lower on the page and is 60 % fainter (40 % strength).
 - New: the pattern's position, size and strength are set by one line, `var WM={x:100,y:55,size:100,opacity:0.4}` near the top of `index.html`; the preview, Print, .html download and PDF all follow it.
