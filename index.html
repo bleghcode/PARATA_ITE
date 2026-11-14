@@ -1,930 +1,1338 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Parata Phattra</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Prompt:wght@500;600&family=Roboto:wght@400;500;700&display=swap">
-<style>
-:root{
-  /* company palette: 231F20 ink, EDF7F6 mint, F3A068 orange, FCEA4A yellow, 506DE2 blue */
-  --bg:#edf7f6; --surface:#ffffff; --surface-2:#e1efed; --line:#c6dad7;
-  --ink:#231f20; --muted:#5a5a5c; --accent:#3f5bd0; --accent-ink:#ffffff; --accent-soft:#dde4fb;
-  --btn-bg:#506de2; --btn-ink:#ffffff; --hi:#fcea4a; --hi-ink:#231f20; --warm:#f3a068; --warm-soft:#fbe3d2; --warm-ink:#6b3412;
-  --danger:#b3261e;
-  --f-display:'Prompt','IBM Plex Sans Thai',system-ui,sans-serif;
-  --f-body:'IBM Plex Sans Thai','Roboto',system-ui,sans-serif;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#1b1819; --surface:#2a2627; --surface-2:#352f31; --line:#4a4346;
-    --ink:#edf7f6; --muted:#a9b8b6; --accent:#8fa3f3; --accent-ink:#231f20; --accent-soft:#2f3558;
-    --btn-bg:#fcea4a; --btn-ink:#231f20; --warm-soft:#4a3426; --warm-ink:#f3a068;
-    --danger:#ff8f86; color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-    --bg:#1b1819; --surface:#2a2627; --surface-2:#352f31; --line:#4a4346;
-    --ink:#edf7f6; --muted:#a9b8b6; --accent:#8fa3f3; --accent-ink:#231f20; --accent-soft:#2f3558;
-    --btn-bg:#fcea4a; --btn-ink:#231f20; --warm-soft:#4a3426; --warm-ink:#f3a068;
-    --danger:#ff8f86; color-scheme:dark;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding:22px 16px 48px;border-top:6px solid;border-image:linear-gradient(90deg,#506de2 0 34%,#f3a068 34% 67%,#fcea4a 67%) 1}
-.wrap{max-width:1280px;margin:0 auto}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0}
-h1{font-size:26px;letter-spacing:-.01em}
-h2{font-size:17px}
-button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;margin-bottom:20px}
-.brand{font:600 18px/1 var(--f-display);display:flex;align-items:center;gap:10px}
-.brand i{width:12px;height:12px;border-radius:3px;background:var(--warm);display:inline-block}
-.theme-btn{margin-left:auto}
-.ver{font:500 12px/1 var(--f-body);color:var(--muted)}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tab{border:0;background:transparent;padding:8px 14px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500}
-.tab:hover{background:var(--surface-2);color:var(--ink)}
-.tab[aria-current="page"]{background:var(--hi);color:var(--hi-ink);font-weight:600}
-.head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:500}
-.btn:hover{border-color:var(--accent)}
-.btn.primary{background:var(--btn-bg);color:var(--btn-ink);border-color:var(--btn-bg)}
-.btn.primary:hover{filter:brightness(1.08)}
-.btn.danger{color:var(--danger)}
-.btn.small{padding:4px 10px;font-size:13px}
-.btn[disabled]{opacity:.5;cursor:default}
-input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
-textarea{resize:vertical;line-height:1.5}
-input[type=search]{width:260px;max-width:100%}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
-.stack{display:flex;flex-direction:column;gap:14px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.grid-name{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px}
-.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-@media (max-width:560px){.grid2,.grid3{grid-template-columns:1fr}}
-.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:20px;align-items:start}
-@media (max-width:1020px){.split{grid-template-columns:1fr}}
-.preview-col{position:sticky;top:12px;min-width:0}
-@media (max-width:1020px){.preview-col{position:static}}
-.scroll-x{overflow-x:auto}
-.row-card{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-.row-card+.row-card{margin-top:8px}
-@media (max-width:640px){.row-card{grid-template-columns:1fr}}
-.num{font:600 22px/1 var(--f-display);color:var(--accent);font-variant-numeric:tabular-nums}
-.sub{color:var(--muted);font-size:13.5px}
-.chip{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--warm-soft);color:var(--warm-ink);margin-right:6px;font-weight:500}
-.empty{padding:40px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
-.empty h2{color:var(--ink);margin-bottom:6px}
-.day{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface-2)}
-.day-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
-.day-head input[type=time]{width:auto}
-.day-head b{font-family:var(--f-display);margin-right:auto}
-.day-head select{width:auto;max-width:55%}
-.gl-row{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) auto;gap:8px;margin-bottom:8px;align-items:center}
-.gl-row.gl-head{font-size:13px;color:var(--muted);margin-bottom:4px}
-.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;margin-bottom:8px}
-.pair.short{grid-template-columns:110px minmax(0,1fr) auto}
-.snip{display:flex;gap:8px;align-items:center;margin-bottom:4px}
-.snip label{margin:0}
-.snip select{width:auto;max-width:60%;margin-left:auto;padding:3px 8px;font-size:13px}
-.banner{padding:10px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);margin-bottom:14px;font-size:14px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:14px;z-index:50;max-width:90vw}
-.lib-list .row-card{grid-template-columns:minmax(0,1fr) auto}
-.pre{white-space:pre-line}
-@media (prefers-reduced-motion:no-preference){.tab,.btn{transition:background .15s,border-color .15s}}
-</style>
-<style id="paper-css">
-.sheet{background:#fff;color:#0e1530;font:13px/1.5 'Roboto','IBM Plex Sans Thai',Arial,sans-serif;padding:28px 30px 34px;max-width:820px;margin:0 auto;border:1px solid #d3d9e8;border-radius:4px}
-.sheet *{box-sizing:border-box}
-.sheet .p-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
-.sheet .p-brand{font:italic 700 30px/1 Georgia,'Times New Roman',serif;color:#2557c7}
-.sheet .p-meta{text-align:right;color:#4a5470;font-size:12px}
-.sheet .p-meta b{color:#0e1530;display:block}
-.sheet .p-band{margin:14px 0 0;padding:10px 24px;background:#fffafa url(/assets/header-band.jpg) center/100% 100% no-repeat;aspect-ratio:898/189;display:flex;flex-direction:column;justify-content:center}
-.sheet .p-band h2{margin:0 0 10px;font:700 22px/1.2 'Roboto',Arial,sans-serif;color:#1b3f8f}
-.sheet .p-band p{margin:2px 0;font-size:12px;font-weight:600;color:#000}
-.sheet .p-days{position:relative;isolation:isolate}
-.sheet .p-days::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(/assets/day-watermark.jpg) var(--wm-x,100%) var(--wm-y,55%)/var(--wm-s,100%) auto no-repeat;opacity:var(--wm-o,.4)}
-.sheet .p-band,.sheet .p-days,.sheet .p-days::before{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sheet .p-title{margin:16px 0 8px;padding:8px 0;border-top:1px solid #2e8fd6;border-bottom:1px solid #2e8fd6;font:700 18px/1.2 'Roboto',Arial,sans-serif}
-.sheet .p-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:12px;padding:5px 0}
-.sheet .p-row div:first-child{color:#2b3350}
-.sheet .p-gl-title{font-weight:700;margin:0 0 6px}
-.sheet .p-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.sheet .p-tbl th,.sheet .p-tbl td{border:1px solid #b8c0d4;padding:4px 8px;text-align:left;vertical-align:top}
-.sheet .p-tbl th{background:#f1f5fc;font-weight:700}
-.sheet .p-tbl th:first-child,.sheet .p-tbl td:first-child{width:44px;text-align:center}
-.sheet .p-tbl tr{break-inside:avoid}
-.sheet .p-rule{border:0;border-top:1px dashed #b8c0d4;margin:14px 0}
-.sheet h4{margin:0 0 4px;font:700 13px/1.3 'Roboto',Arial,sans-serif}
-.sheet .p-day{margin:18px 0 0;break-inside:avoid}
-.sheet .p-ln{display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px;padding:1px 0}
-.sheet .p-t{color:#2b3350}
-.sheet .p-x::before{content:'\2022\00a0\00a0'}
-.sheet .p-x.p-sub{margin-left:16px}
-.sheet .p-x.p-sub::before{content:'-\00a0\00a0'}
-.sheet ul{margin:0 0 0 40px;padding:0}
-.sheet li{margin:2px 0}
-.sheet .p-note{font-style:italic;font-size:11px;color:#3b4460;white-space:pre-line;margin:6px 0}
-.sheet .p-pre{white-space:pre-line;margin:0}
-.sheet .p-terms{color:#555d75;font-size:12px;margin-top:6px}
-.sheet .p-thanks{text-align:center;font:700 14px/1.4 'Roboto',Arial,sans-serif;color:#3b4460;margin-top:14px}
-.sheet .p-reg{text-align:center;color:#555d75;font-size:12px}
-.sheet .p-row{break-inside:avoid}
-@media (max-width:520px){.sheet{padding:18px 14px}.sheet .p-row{grid-template-columns:1fr;gap:0}.sheet ul{margin-left:22px}}
-@media print{
-  @page{margin:12mm}
-  body{background:#fff;padding:0;border:0}
-  .top,#banner,.head,#form,#toast{display:none!important}
-  .split{display:block}
-  .preview-col{position:static}
-  .scroll-x{overflow:visible}
-  .sheet{border:0;max-width:none;padding:0}
-}
-</style>
-<script>try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#C98B15">
+    <script>(function () { try { var t = localStorage.getItem('tcs:v1:theme'); if (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark'; if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();</script>
+    <title>Cost Summary</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <!-- ฟอนต์ Sarabun: โหลดเมื่อออนไลน์ ถ้าออฟไลน์จะใช้ฟอนต์ไทยของเครื่องแทน -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap">
+    <style>
+        :root {
+            --brand: #C98B15; --section: #F1F4F9; --dark: #1E293B;
+            --line: #e5e7eb; --line-soft: #f3f4f6; --muted: #6b7280; --faint: #9ca3af;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; }
+        body {
+            font-family: 'Sarabun', 'Leelawadee UI', 'Tahoma', 'Thonburi', 'Noto Sans Thai', sans-serif;
+            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+            background: #f3f4f6; color: #1f2937; font-size: 14px; line-height: 1.5;
+        }
+        button { font-family: inherit; cursor: pointer; }
+        h1 { margin: 0; }
+
+        /* ---------- ช่องกรอกข้อมูล ---------- */
+        input, [contenteditable] {
+            border: none; outline: none; background: transparent; width: 100%;
+            font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
+            padding: 0; margin: 0; transition: background-color .2s;
+        }
+        input:hover:not(:focus), [contenteditable]:hover:not(:focus) { background-color: rgba(0,0,0,.03); border-radius: 4px; }
+        input:focus, [contenteditable]:focus { background-color: rgba(201,139,21,.07); border-radius: 4px; }
+        input::placeholder { color: #9ca3af; }
+
+        /* ---------- โครงแอป ---------- */
+        .app { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 290px; flex: none; background: #fff; border-right: 1px solid var(--line);
+            display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0;
+        }
+        .sb-head { padding: 14px 14px 10px; border-bottom: 1px solid var(--line-soft); }
+        .sb-title { font-weight: 700; font-size: 16px; color: var(--dark); margin-bottom: 10px; }
+        .btn { border: 1px solid transparent; border-radius: 6px; padding: 7px 12px; font-size: 13px; font-weight: 600; transition: background .15s; }
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-primary:hover { background: #b57a10; }
+        .btn-blue { background: #2563eb; color: #fff; }
+        .btn-blue:hover { background: #1d4ed8; }
+        .btn-ghost { background: #fff; border-color: #d1d5db; color: #374151; }
+        .btn-ghost:hover { background: #f9fafb; }
+        .btn-block { width: 100%; }
+        .search { margin-top: 8px; border: 1px solid #d1d5db !important; border-radius: 6px; padding: 6px 10px !important; background: #fff !important; font-size: 13px; }
+        .doc-list { flex: 1; overflow-y: auto; padding: 8px; }
+        .doc-item { border: 1px solid transparent; border-radius: 8px; padding: 9px 10px; cursor: pointer; margin-bottom: 4px; }
+        .doc-item:hover { background: #f9fafb; }
+        .doc-item.active { background: #fdf6e7; border-color: #ecd29a; }
+        .di-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+        .di-ref { font-weight: 700; color: var(--dark); font-size: 13px; }
+        .di-total { font-weight: 600; color: var(--brand); font-size: 13px; white-space: nowrap; }
+        .di-name { font-size: 13px; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .di-name.empty { color: var(--faint); font-style: italic; }
+        .di-meta { font-size: 11px; color: var(--faint); display: flex; justify-content: space-between; gap: 6px; align-items: center; margin-top: 2px; }
+        .di-actions button { background: none; border: none; color: var(--muted); font-size: 11px; padding: 2px 4px; border-radius: 4px; }
+        .di-actions button:hover { background: #e5e7eb; color: #111827; }
+        .di-actions .del:hover { background: #fee2e2; color: #b91c1c; }
+        .list-empty { text-align: center; color: var(--faint); padding: 24px 8px; font-size: 13px; }
+        .sb-foot { border-top: 1px solid var(--line-soft); padding: 10px 14px 14px; display: grid; gap: 6px; }
+        .sb-note { font-size: 11px; color: var(--muted); line-height: 1.4; }
+        .sb-note.warn { color: #b45309; }
+
+        .main { flex: 1; min-width: 0; padding: 0 16px 32px; }
+        .topbar {
+            position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px;
+            padding: 10px 0; margin-bottom: 8px; background: linear-gradient(#f3f4f6 80%, rgba(243,244,246,0));
+        }
+        .topbar .spacer { flex: 1; }
+        .menu-btn { display: none; }
+        .status { font-size: 12px; color: var(--muted); }
+        .status.ok::before { content: "●"; color: #16a34a; margin-right: 5px; }
+        .status.bad { color: #b91c1c; font-weight: 600; }
+        .banner { max-width: 210mm; margin: 0 auto 10px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+        .banner[hidden] { display: none; }
+
+        .toast {
+            position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 90;
+            background: #1f2937; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.25); display: flex; gap: 14px; align-items: center; max-width: 92vw;
+        }
+        .toast[hidden] { display: none; }
+        .toast button { background: none; border: none; color: #fbbf24; font-weight: 700; font-size: 13px; padding: 0; }
+        .backdrop { display: none; }
+
+        /* ---------- แผ่นเอกสาร ---------- */
+        .sheet {
+            max-width: 210mm; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,.1), 0 4px 10px -6px rgba(0,0,0,.1); position: relative;
+        }
+        .text-brand { color: var(--brand); }
+        .doc-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 2rem 0 1rem; }
+        .doc-head .left { width: 60%; }
+        .doc-head .right { width: 40%; text-align: right; }
+        #company-name-input { font-size: 1.5rem; font-weight: 700; color: var(--brand); text-transform: uppercase; margin-bottom: .25rem; line-height: 1.5; }
+        #address { color: var(--muted); line-height: 1.625; font-size: .75rem; white-space: pre-line; }
+        .doc-title { font-size: 1.5rem; font-weight: 700; color: #1a202c; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+        .meta-row { display: flex; justify-content: flex-end; gap: .5rem; font-size: .75rem; color: var(--muted); }
+        .meta-row + .meta-row { margin-top: .25rem; }
+        .meta-row .lbl { font-weight: 600; color: #374151; }
+        .w-24 { width: 6rem; } .w-32 { width: 8rem; }
+        .text-right { text-align: right; }
+        .divider { border-bottom: 2px solid var(--brand); margin-bottom: 1.5rem; }
+
+        .cust-box { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 1.5rem; background: #fcfdfd; }
+        .cust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; }
+        .cust-label { font-size: .625rem; color: var(--faint); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+        .cust-val { font-weight: 700; color: var(--dark); font-size: 1rem; }
+        .travel { display: flex; align-items: center; gap: .25rem; font-weight: 700; color: var(--dark); font-size: 1rem; }
+        .date-box { border-bottom: 1px dashed #d1d5db; text-align: center; }
+        .px-1 { padding: 0 .25rem; }
+        .counts { border-top: 1px solid var(--line); padding: .75rem 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; font-size: .75rem; background: #f9fafb; border-radius: 0 0 8px 8px; }
+        .counts > div { display: flex; align-items: center; gap: .5rem; }
+        .counts b { color: #374151; }
+        .counts input { width: 3rem; border-bottom: 1px dashed #d1d5db; padding: 0 .25rem; -moz-appearance: textfield; }
+        .counts input::-webkit-outer-spin-button, .counts input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        table { width: 100%; text-align: left; border-collapse: collapse; }
+        thead tr { background: var(--brand); color: #fff; }
+        th { padding: .625rem 1rem; font-weight: 700; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
+        th:nth-child(1) { width: 52%; border-top-left-radius: 2px; }
+        th:nth-child(2) { width: 24%; }
+        th:nth-child(3) { width: 24%; text-align: right; border-top-right-radius: 2px; }
+        .sec-row { background: var(--section); color: var(--dark); font-weight: 700; }
+        .sec-row td { padding: .5rem 1rem; border-bottom: 1px solid var(--line-soft); }
+        .sec-title { display: flex; align-items: center; gap: .75rem; }
+        .btn-add { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 4px; padding: .125rem .5rem; font-size: .75rem; font-weight: 400; }
+        .btn-add:hover { background: #dbeafe; }
+        .item-row { border-bottom: 1px solid var(--line-soft); color: #4b5563; }
+        .item-row td { padding: .5rem 1rem; position: relative; }
+        .item-row td:last-child { text-align: right; }
+        .item-row input.auto-calc { text-align: right; font-weight: 500; }
+        .btn-remove {
+            position: absolute; left: -20px; top: 50%; transform: translateY(-50%); color: #ef4444; cursor: pointer;
+            font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            width: 20px; height: 20px; opacity: .3;
+        }
+        .btn-remove:hover { opacity: 1; }
+        .subtotal-row { font-weight: 700; color: var(--dark); background: #fff; border-bottom: 1px solid var(--line); }
+        .subtotal-row td { padding: .75rem 1rem; text-align: right; }
+        .subtotal-row td:last-child { color: var(--brand); }
+        .grand { background: var(--brand); color: #fff; font-weight: 700; font-size: 1rem; }
+        .grand td { padding: 1rem; text-align: right; }
+        .grand td:first-child { text-transform: uppercase; letter-spacing: .025em; border-bottom-left-radius: 2px; }
+        .grand td:last-child { border-bottom-right-radius: 2px; }
+        .doc-foot { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); }
+        .help { max-width: 210mm; margin: 16px auto 0; font-size: .75rem; color: #3b82f6; text-align: center; background: #eff6ff; padding: 1rem; border-radius: 8px; border: 1px solid #dbeafe; line-height: 1.7; }
+
+        @media (min-width: 768px) {
+            .sheet { padding: 3rem; }
+            #company-name-input { font-size: 1.5rem; }
+            #address, .meta-row, .counts { font-size: .875rem; }
+            .doc-title { font-size: 1.875rem; }
+            .cust-label { font-size: .75rem; }
+            .cust-val, .travel { font-size: 1.125rem; }
+            .grand { font-size: 1.125rem; }
+        }
+
+        select.search { width: 100%; }
+        .di-lt { display: flex; gap: 6px; align-items: center; min-width: 0; }
+        .st { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+        .st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .st-Draft { color: #6b7280; background: #f3f4f6; }
+        .st-Sent { color: #1d4ed8; background: #dbeafe; }
+        .st-Confirmed { color: #15803d; background: #dcfce7; }
+        .st-Completed { color: #6d28d9; background: #ede9fe; }
+        .st-Cancelled { color: #b91c1c; background: #fee2e2; }
+        .status-select { font: inherit; font-size: .75rem; border: 1px solid #d1d5db; border-radius: 6px; padding: 1px 6px; background: #fff; color: #374151; cursor: pointer; }
+        .status-select:focus { outline: 2px solid rgba(201,139,21,.4); }
+        .ref-warn { color: #b91c1c; font-size: .7rem; text-align: right; margin-top: .125rem; }
+        .ref-warn[hidden] { display: none; }
+        .nights { font-size: .75rem; font-weight: 500; color: var(--faint); margin-left: .5rem; white-space: nowrap; }
+        .item-row input.row-type { color: #6b7280; }
+
+        /* รายการแนะนำ (autocomplete) */
+        .ac-pop { position: absolute; z-index: 70; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.15); max-height: 260px; overflow-y: auto; padding: 4px; font-size: 13px; color: #1f2937; font-weight: 400; }
+        .ac-pop[hidden] { display: none; }
+        .ac-item { padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+        .ac-item:hover, .ac-item.sel { background: #fdf6e7; }
+        .ac-item.add { color: #2563eb; font-weight: 600; }
+        .ac-item.hint { color: #9ca3af; cursor: default; }
+        .ac-item.hint:hover { background: none; }
+
+        /* หน้าต่างจัดการรายชื่อ */
+        .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 80; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .modal-back[hidden] { display: none; }
+        .modal { background: #fff; border-radius: 12px; width: min(560px, 100%); max-height: 88vh; display: flex; flex-direction: column; padding: 16px; gap: 10px; box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
+        .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tab { border: 1px solid #d1d5db; background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+        .tab.active { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+        .m-add { display: flex; gap: 8px; }
+        .m-add input, .m-bulk textarea, .m-row input { border: 1px solid #d1d5db !important; border-radius: 6px; padding: 6px 10px !important; background: #fff !important; font-size: 13px; }
+        .m-bulk summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+        .m-bulk textarea { width: 100%; display: block; margin: 6px 0; font-family: inherit; }
+        .m-list { flex: 1; overflow-y: auto; min-height: 120px; border-top: 1px solid var(--line-soft); padding-top: 6px; }
+        .m-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+        .m-row input { flex: 1; }
+        .m-types { font-size: 11px; color: var(--faint); max-width: 38%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .m-del { background: none; border: none; color: #ef4444; font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+        .m-del:hover { background: #fee2e2; }
+
+        /* ---------- มือถือ / จอแคบ ---------- */
+        @media (max-width: 899px) {
+            .sidebar { position: fixed; left: 0; top: 0; z-index: 50; transform: translateX(-100%); transition: transform .2s; }
+            .sidebar.open { transform: none; box-shadow: 4px 0 20px rgba(0,0,0,.2); }
+            .backdrop.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 40; }
+            .menu-btn { display: inline-block; }
+            .main { padding: 0 8px 32px; }
+        }
+        @media (max-width: 560px) {
+            .sheet { padding: 1.25rem; }
+            .btn-remove { left: -8px; }
+            .doc-head { flex-direction: column; gap: .75rem; }
+            .doc-head .left, .doc-head .right { width: 100%; text-align: left; }
+            .meta-row { justify-content: flex-start; }
+            .meta-row input { text-align: left; }
+            .cust-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ---------- โหมดกลางคืน (ใช้เฉพาะบนหน้าจอ ไม่ถูกใช้ตอนพิมพ์/Save as PDF) ---------- */
+        @media screen {
+            html[data-theme="dark"] { color-scheme: dark; }
+            html[data-theme="dark"] body { background: #111418; color: #e5e7eb; }
+            html[data-theme="dark"] input:hover:not(:focus), html[data-theme="dark"] [contenteditable]:hover:not(:focus) { background-color: rgba(255,255,255,.06); }
+            html[data-theme="dark"] input:focus, html[data-theme="dark"] [contenteditable]:focus { background-color: rgba(201,139,21,.16); }
+            html[data-theme="dark"] input::placeholder { color: #6b7280; }
+
+            html[data-theme="dark"] .sidebar { background: #171b21; border-right-color: #2a3038; }
+            html[data-theme="dark"] .sb-head, html[data-theme="dark"] .sb-foot { border-color: #2a3038; }
+            html[data-theme="dark"] .sb-title, html[data-theme="dark"] .di-ref { color: #f3f4f6; }
+            html[data-theme="dark"] .btn-ghost { background: #1f252d; border-color: #3a424d; color: #e5e7eb; }
+            html[data-theme="dark"] .btn-ghost:hover { background: #2a313b; }
+            html[data-theme="dark"] .search, html[data-theme="dark"] .m-add input, html[data-theme="dark"] .m-bulk textarea, html[data-theme="dark"] .m-row input { background: #1f252d !important; border-color: #3a424d !important; color: #e5e7eb; }
+            html[data-theme="dark"] .doc-item:hover { background: #1f252d; }
+            html[data-theme="dark"] .doc-item.active { background: #2b2415; border-color: #6b551f; }
+            html[data-theme="dark"] .di-name { color: #d1d5db; }
+            html[data-theme="dark"] .di-name.empty, html[data-theme="dark"] .di-meta, html[data-theme="dark"] .list-empty { color: #8b95a1; }
+            html[data-theme="dark"] .di-actions button { color: #9ca3af; }
+            html[data-theme="dark"] .di-actions button:hover { background: #2a313b; color: #f3f4f6; }
+            html[data-theme="dark"] .di-actions .del:hover { background: #4a1f1f; color: #fca5a5; }
+            html[data-theme="dark"] .di-total { color: #e0a53a; }
+            html[data-theme="dark"] .sb-note { color: #9ca3af; }
+            html[data-theme="dark"] .sb-note.warn { color: #fbbf24; }
+            html[data-theme="dark"] .topbar { background: linear-gradient(#111418 80%, rgba(17,20,24,0)); }
+            html[data-theme="dark"] .status { color: #9ca3af; }
+            html[data-theme="dark"] .banner { background: #3a1d1d; border-color: #7f2d2d; color: #fecaca; }
+            html[data-theme="dark"] .toast { background: #2b3340; border: 1px solid #4a5563; color: #f3f4f6; }
+            html[data-theme="dark"] .ref-warn { color: #f87171; }
+
+            html[data-theme="dark"] .sheet { background: #1b2027; box-shadow: 0 10px 25px -5px rgba(0,0,0,.6); color: #e5e7eb; }
+            html[data-theme="dark"] .doc-title { color: #f3f4f6; }
+            html[data-theme="dark"] #address, html[data-theme="dark"] .meta-row, html[data-theme="dark"] .nights { color: #9ca3af; }
+            html[data-theme="dark"] .meta-row .lbl, html[data-theme="dark"] .counts b { color: #d1d5db; }
+            html[data-theme="dark"] .cust-box { background: #1f252d; border-color: #2f3640; }
+            html[data-theme="dark"] .cust-label { color: #8b95a1; }
+            html[data-theme="dark"] .cust-val, html[data-theme="dark"] .travel { color: #f3f4f6; }
+            html[data-theme="dark"] .date-box, html[data-theme="dark"] .counts input { border-bottom-color: #3a424d; }
+            html[data-theme="dark"] .counts { background: #1b2027; border-top-color: #2f3640; }
+            html[data-theme="dark"] .status-select { background: #1f252d; border-color: #3a424d; color: #e5e7eb; }
+
+            html[data-theme="dark"] .sec-row { background: #252c35; color: #f3f4f6; }
+            html[data-theme="dark"] .sec-row td { border-bottom-color: #2f3640; }
+            html[data-theme="dark"] .btn-add { background: #1e2a3f; color: #93c5fd; border-color: #2b4670; }
+            html[data-theme="dark"] .btn-add:hover { background: #26375a; }
+            html[data-theme="dark"] .item-row { border-bottom-color: #2a3038; color: #cbd5e1; }
+            html[data-theme="dark"] .item-row input.row-type { color: #94a3b8; }
+            html[data-theme="dark"] .subtotal-row { background: #1b2027; color: #f3f4f6; border-bottom-color: #2f3640; }
+            html[data-theme="dark"] .subtotal-row td:last-child { color: #e0a53a; }
+            html[data-theme="dark"] .doc-foot { border-top-color: #2f3640; color: #8b95a1; }
+            html[data-theme="dark"] .help { background: #172033; color: #93c5fd; border-color: #243a5e; }
+
+            html[data-theme="dark"] .ac-pop { background: #1f252d; border-color: #3a424d; color: #e5e7eb; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+            html[data-theme="dark"] .ac-item:hover, html[data-theme="dark"] .ac-item.sel { background: #2b2415; }
+            html[data-theme="dark"] .ac-item.add { color: #93c5fd; }
+            html[data-theme="dark"] .ac-item.hint { color: #8b95a1; }
+            html[data-theme="dark"] .modal { background: #1b2027; color: #e5e7eb; }
+            html[data-theme="dark"] .tab { background: #1f252d; border-color: #3a424d; color: #e5e7eb; }
+            html[data-theme="dark"] .tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+            html[data-theme="dark"] .m-list { border-top-color: #2a3038; }
+            html[data-theme="dark"] .m-bulk summary { color: #9ca3af; }
+            html[data-theme="dark"] .m-del:hover { background: #4a1f1f; }
+
+            html[data-theme="dark"] .st-Draft { color: #cbd5e1; background: #2a3038; }
+            html[data-theme="dark"] .st-Sent { color: #93c5fd; background: #1e2a3f; }
+            html[data-theme="dark"] .st-Confirmed { color: #86efac; background: #14301f; }
+            html[data-theme="dark"] .st-Completed { color: #c4b5fd; background: #2a2147; }
+            html[data-theme="dark"] .st-Cancelled { color: #fca5a5; background: #3a1d1d; }
+        }
+
+        /* ---------- พิมพ์ / Save as PDF ---------- */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .app { display: block; }
+            .main { padding: 0; }
+            .sheet { box-shadow: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; border-radius: 0; }
+            @page { size: A4 portrait; margin: 10mm; }
+            input::placeholder, [contenteditable]:empty::before { color: transparent !important; }
+            .date-box { border-bottom-color: transparent; }
+            input:hover, [contenteditable]:hover { background: transparent !important; }
+        }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand"><i></i>Parata Ite <span class="ver" id="ver"></span></div>
-    <nav class="tabs" id="nav" aria-label="Main menu"></nav>
-    <button class="btn small theme-btn" id="themeBtn" type="button"></button>
-  </header>
-  <div id="banner"></div>
-  <main id="main"></main>
+<div class="app">
+
+    <!-- ===== รายการเอกสาร ===== -->
+    <aside class="sidebar no-print" id="sidebar">
+        <div class="sb-head">
+            <div class="sb-title">Cost Summary</div>
+            <button class="btn btn-primary btn-block" onclick="newDoc()">+ ใบใหม่</button>
+            <input type="search" id="search" class="search" placeholder="ค้นหา Ref / ชื่อลูกค้า" oninput="renderList()">
+            <select id="status-filter" class="search" onchange="renderList()">
+                <option value="">All status</option><option>Draft</option><option>Sent</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option>
+            </select>
+        </div>
+        <div class="doc-list" id="doc-list"></div>
+        <div class="sb-foot">
+            <a class="btn btn-ghost btn-block" href="walkin.html" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">📑 Walk-in Cost Report (โหมดงานนอก) →</a>
+            <button class="btn btn-ghost btn-block" onclick="openMaster()">📋 จัดการรายชื่อ (โรงแรม / สถานที่)</button>
+            <button class="btn btn-ghost btn-block" onclick="exportAll()">สำรองข้อมูลทั้งหมด (.json)</button>
+            <button class="btn btn-ghost btn-block" onclick="document.getElementById('import-file').click()">นำเข้าจากไฟล์สำรอง</button>
+            <input type="file" id="import-file" accept=".json,application/json" hidden onchange="importFile(this)">
+            <div class="sb-note" id="backup-note"></div>
+            <div class="sb-note" id="app-version"></div>
+        </div>
+    </aside>
+    <div class="backdrop no-print" id="backdrop" onclick="toggleSidebar(false)"></div>
+
+    <!-- ===== เอกสาร ===== -->
+    <main class="main">
+        <div class="topbar no-print">
+            <button class="btn btn-ghost menu-btn" onclick="toggleSidebar(true)">☰ รายการ</button>
+            <span class="status ok" id="status">พร้อมใช้งาน</span>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost" id="theme-btn" onclick="toggleTheme()" title="สลับโหมดกลางคืน / กลางวัน (ไม่มีผลกับ PDF)">🌙 Dark</button>
+            <button class="btn btn-ghost" onclick="exportCurrent()">Export ใบนี้</button>
+            <button class="btn btn-blue" onclick="printDoc()">🖨 Save as PDF</button>
+        </div>
+        <div class="banner no-print" id="storage-banner" hidden>
+            ⚠ เบราว์เซอร์นี้ไม่ยอมให้เก็บข้อมูลในเครื่อง (อาจเปิดโหมดส่วนตัว หรือบล็อกการเก็บข้อมูล) ข้อมูลจะหายเมื่อปิดหน้า กรุณากดสำรองข้อมูลเป็นไฟล์ก่อนปิด
+        </div>
+
+        <div class="sheet" id="sheet">
+            <div class="doc-head">
+                <div class="left">
+                    <input type="text" id="company-name-input" placeholder="COMPANY NAME">
+                    <div contenteditable="true" id="address"></div>
+                </div>
+                <div class="right">
+                    <h1 class="doc-title">Cost Summary</h1>
+                    <div class="meta-row">
+                        <span class="lbl">Date:</span>
+                        <input type="text" class="w-24 text-right" id="current-date">
+                    </div>
+                    <div class="meta-row">
+                        <span class="lbl">Ref:</span>
+                        <input type="text" class="w-32 text-right" id="ref-input">
+                    </div>
+                    <div class="ref-warn no-print" id="ref-warn" hidden>⚠ Ref ซ้ำกับอีกเอกสาร</div>
+                    <div class="meta-row no-print">
+                        <span class="lbl">Status:</span>
+                        <select id="status-select" class="status-select">
+                            <option>Draft</option><option>Sent</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="cust-box">
+                <div class="cust-grid">
+                    <div>
+                        <div class="cust-label">Customer Name</div>
+                        <input type="text" id="customer-name-input" class="cust-val" placeholder="Enter Customer Name">
+                    </div>
+                    <div>
+                        <div class="cust-label">Travel Date</div>
+                        <div class="travel">
+                            <input type="text" inputmode="numeric" maxlength="2" class="date-box" style="width:2.25rem" placeholder="DD">
+                            <span>/</span>
+                            <input type="text" inputmode="numeric" maxlength="2" class="date-box" style="width:2.25rem" placeholder="MM">
+                            <span class="px-1">-</span>
+                            <input type="text" inputmode="numeric" maxlength="2" class="date-box" style="width:2.25rem" placeholder="DD">
+                            <span>/</span>
+                            <input type="text" inputmode="numeric" maxlength="2" class="date-box" style="width:2.25rem" placeholder="MM">
+                            <span class="px-1">-</span>
+                            <input type="text" inputmode="numeric" maxlength="4" class="date-box" style="width:3.5rem" placeholder="YYYY">
+                            <span class="nights" id="nights" title="จำนวนคืน / วัน"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="counts">
+                    <div><b>Adults:</b> <input type="number" id="adults-input" placeholder="0"></div>
+                    <div><b>Children:</b> <input type="number" id="children-input" placeholder="0"></div>
+                    <div><b>Infants:</b> <input type="number" id="infants-input" placeholder="0"></div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>Description</th><th>Type</th><th>Amount (THB)</th></tr>
+                </thead>
+
+                <tbody id="sec-acc">
+                    <tr class="sec-row"><td colspan="3"><div class="sec-title">Accommodation <button class="no-print btn-add" onclick="addRow('sec-acc')">+ Add Row</button></div></td></tr>
+                    <tr class="subtotal-row"><td colspan="2">Accommodation Total</td><td><span class="subtotal-display">0</span></td></tr>
+                </tbody>
+
+                <tbody id="sec-tour">
+                    <tr class="sec-row"><td colspan="3"><div class="sec-title">Tours &amp; Sightseeing <button class="no-print btn-add" onclick="addRow('sec-tour')">+ Add Row</button></div></td></tr>
+                    <tr class="subtotal-row"><td colspan="2">Tour Total Cost</td><td><span class="subtotal-display">0</span></td></tr>
+                </tbody>
+
+                <tbody id="sec-trans">
+                    <tr class="sec-row"><td colspan="3"><div class="sec-title">Transportation <button class="no-print btn-add" onclick="addRow('sec-trans')">+ Add Row</button></div></td></tr>
+                    <tr class="subtotal-row"><td colspan="2">Total Transport Cost</td><td><span class="subtotal-display">0</span></td></tr>
+                </tbody>
+
+                <tbody id="sec-other">
+                    <tr class="sec-row"><td colspan="3"><div class="sec-title">Other <button class="no-print btn-add" onclick="addRow('sec-other')">+ Add Row</button></div></td></tr>
+                    <tr class="subtotal-row" hidden><td colspan="2"></td><td><span class="subtotal-display">0</span></td></tr>
+                </tbody>
+
+                <tbody>
+                    <tr class="grand"><td colspan="2">Grand Total</td><td><span id="t_grand">0</span></td></tr>
+                </tbody>
+            </table>
+
+            <div class="doc-foot">
+                <div id="footer-company-name"></div>
+                <div>Page 1 of 1</div>
+            </div>
+        </div>
+
+        <div class="help no-print">
+            💡 <b>วิธีใช้:</b> ข้อมูลทุกอย่างบันทึกลงเครื่องอัตโนมัติ ปิดหน้าแล้วกลับมาทำต่อได้ที่รายการด้านซ้าย
+            <br>กด <b>"+ Add Row"</b> เพื่อเพิ่มรายการ (พิมพ์ชื่อแล้วเลือกจากรายการได้ จัดการรายการที่เมนูซ้าย) · กด <b>×</b> สีแดงหน้าแถวเพื่อลบแถว · ใส่เครื่องหมาย <b>-</b> หน้าตัวเลขเพื่อใส่ส่วนลด
+            <br>⚠ ข้อมูลอยู่ในเบราว์เซอร์นี้เท่านั้น ถ้าล้างข้อมูลเบราว์เซอร์จะหาย ควรกด <b>"สำรองข้อมูลทั้งหมด"</b> เป็นระยะ
+        </div>
+    </main>
 </div>
-<div id="toast" hidden role="status"></div>
+
+<div class="modal-back no-print" id="master-modal" hidden onclick="if (event.target === this) closeMaster()">
+    <div class="modal">
+        <div class="modal-head"><b>จัดการรายชื่อ</b><button class="btn btn-ghost" onclick="closeMaster()">ปิด</button></div>
+        <div class="tabs" id="master-tabs"></div>
+        <div class="m-add">
+            <input type="text" id="master-new" placeholder="พิมพ์ชื่อ แล้วกด Enter เพื่อเพิ่ม" autocomplete="off" onkeydown="if (event.key === 'Enter') masterAddOne()">
+            <button class="btn btn-primary" onclick="masterAddOne()">เพิ่ม</button>
+        </div>
+        <details class="m-bulk">
+            <summary>เพิ่มทีละหลายรายการ (วางจาก Excel ได้ บรรทัดละ 1 ชื่อ)</summary>
+            <textarea id="master-bulk" rows="5"></textarea>
+            <button class="btn btn-ghost" onclick="masterAddBulk()">เพิ่มทั้งหมด</button>
+        </details>
+        <div class="m-list" id="master-list"></div>
+        <div class="sb-note">เวลาทำใบ พิมพ์ชื่อในช่อง Description แล้วเลือกจากรายการ หรือกด “+ เพิ่ม” เข้ารายการได้ทันที · การแก้ชื่อหรือลบในหน้านี้ไม่เปลี่ยนใบที่ทำไปแล้ว</div>
+    </div>
+</div>
+
+<div class="toast no-print" id="toast" hidden><span id="toast-msg"></span><button id="toast-act" hidden></button></div>
 
 <script>
-(function(){
 'use strict';
-var $=function(s,r){return (r||document).querySelector(s)};
-var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
 
-// PRITE = PARATA Itinerary. Raise this number with every change and note it in CHANGELOG.md.
-var VERSION='PRITE V.1.5.2';
-// Pattern behind the DAY section (paper preview, print, .html and PDF all use these four numbers):
-//   x = left/right position, 0 = left edge, 100 = right edge
-//   y = up/down position,    0 = top,       100 = bottom      (smaller number = pattern sits lower on the page)
-//   size = width of the picture as % of the section width
-//   opacity = 1 is full strength, 0.4 is 40 % strength, 0 hides it
-var WM={x:100,y:55,size:90,opacity:0.10};
-var CO_DEFAULT={brand:'Your Brand',name:'Your Company Co Ltd.',address:'',phones:'',email:'',location:'',regNo:''};
-var TOUR_CATS=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Transfer','Transfer'],['Kanchanaburi','Kanchanaburi'],['Meals','Meals'],['Other','Other']];
-var CITIES=[['Pattaya','Pattaya'],['Bangkok','Bangkok'],['Phuket','Phuket'],['Other','Other']];
-var SNIP_KINDS=[['hotelCond','Hotel conditions'],['meals','Meals'],['terms','Terms & Conditions'],['prefix','Name prefix (Mr., Mrs. ...)'],['agent','Booking agent'],['other','Other']];
-var LIBS={
-  tours:{title:'Tours & activities',hint:'Items you can add to each day of an itinerary',add:'Add item',
-    fields:[['name','Item name (shown on the itinerary)','text'],['cat','Category','select',TOUR_CATS],['note','Extra text after the name (optional)','textarea']]},
-  hotels:{title:'Hotels',hint:'Suggestions when entering hotels on an itinerary',add:'Add hotel',
-    fields:[['name','Hotel name','text'],['city','City','select',CITIES]]},
-  snippets:{title:'Standard text',hint:'Hotel conditions, meals and terms reused on every itinerary',add:'Add text',
-    fields:[['title','Title','text'],['kind','Type','select',SNIP_KINDS],['body','Content','textarea']]}
+/* ============ ค่าคงที่ ============ */
+const KEY_DOCS = 'tcs:v1:docs';
+const KEY_CUR = 'tcs:v1:current';
+const KEY_BACKUP = 'tcs:v1:lastBackup';
+const KEY_MASTER = 'tcs:v1:master';
+const APP_VERSION = '1.7.0';
+const STATUSES = ['Draft', 'Sent', 'Confirmed', 'Completed', 'Cancelled'];
+const SECTIONS = ['sec-acc', 'sec-tour', 'sec-trans', 'sec-other'];
+const PLACEHOLDER = {
+    'sec-acc': 'Accommodation Description (e.g., Season Siam Hotel)',
+    'sec-tour': 'Tour Description',
+    'sec-trans': 'Transport Description',
+    'sec-other': 'Miscellaneous / Other Cost'
 };
-var NAV=[['list','Itineraries'],['tours','Tours'],['hotels','Hotels'],['snippets','Standard text']];
-var KINDS=['tours','hotels','snippets','itineraries'];
-// Options for the Transport dropdowns. Edit these two lists to change the choices.
-var ROUTES=['Bangkok Airport Pick-up by','Bangkok to Pattaya Transport by','Pattaya to Bangkok Transport by','Bangkok Airport Drop-off by','Other Tours Travel by'];
-var VEHICLES=['Car','Van','6 Seater','9 Seater','12 Seater','Bus'];
-// Sales staff shown in the Booking Agent dropdown. Add each person's name to this list.
-var AGENTS=['Dhanuka','Ramesh'];
+const DEFAULT_COMPANY = 'INDOSIAMCEYLON INTERNATIONAL';
+const DEFAULT_ADDRESS = '94 Ratchaprarop Road, Thanon Phaya Thai, Ratchathewi, Bangkok 10400';
 
-var S={tours:[],hotels:[],snippets:[],itineraries:[],company:null,loaded:{},view:'list',editId:null,draft:null,
-  saving:false,dirty:false,libEdit:null,delArmed:false,q:'',err:'',loadP:null};
+let docs = {};          // สำเนาในหน่วยความจำของข้อมูลที่เก็บไว้
+let curId = null;       // id ของใบที่เปิดอยู่
+let curCreatedAt = 0;
+let loading = false;    // ระหว่างโหลดใบเข้าฟอร์ม ห้ามบันทึกซ้ำ
+let storageOk = true;
+let saveTimer = null;
+let dirty = false;      // มีการแก้ไขที่ยังไม่ได้บันทึกในหน้านี้
+let loadedAt = 0;       // updatedAt ของใบนี้ตอนเปิด/บันทึกล่าสุด (ไว้ตรวจว่าอีกหน้าต่างแก้ไปแล้วหรือไม่)
+let lastSize = 0, sizeWarned = false;
 
-/* ---------- helpers ---------- */
-function toast(msg,ms){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},ms||2600)}
-function lines(t){return String(t||'').split('\n').map(function(s){return s.trim()}).filter(Boolean)}
-function parseD(s){var p=String(s||'').slice(0,10).split('-').map(Number);return p.length===3&&p[0]?new Date(Date.UTC(p[0],p[1]-1,p[2])):null}
-function fmtDate(s){var d=parseD(s);if(!d)return '';var f=function(o){return new Intl.DateTimeFormat('en-GB',Object.assign({timeZone:'UTC'},o)).format(d)};return f({day:'numeric'})+' '+f({month:'long'})+' , '+f({year:'numeric'})+' ,'+f({weekday:'long'})}
-// "18 Nov" for the day headings; day i of the trip = arrival date + i
-function dayLabel(d,i){var a=parseD(d.arrival),t='Day '+(i+1);if(!a)return t;var x=new Date(a.getTime()+i*864e5);return t+' ('+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}).format(x)+')'}
-// Name prefixes: these defaults plus any "Name prefix" item added on the Standard text page.
-var BASE_PREFIXES=['Mr.','Mrs.','Ms.','Miss','Dr.'];
-function prefixList(){
-  var out=BASE_PREFIXES.slice();
-  S.snippets.forEach(function(x){if(x.kind==='prefix'&&x.title&&out.indexOf(x.title)<0)out.push(x.title)});
-  return out;
-}
-// Booking agents: the names in AGENTS plus any "Booking agent" item added on the Standard text page.
-function agentList(){
-  var out=AGENTS.slice();
-  S.snippets.forEach(function(x){if(x.kind==='agent'&&x.title&&out.indexOf(x.title)<0)out.push(x.title)});
-  return out;
-}
-function guestFull(d){return [d.title,d.guestName].filter(Boolean).join(' ').trim()}
-// File name for PDF / download.
-//   same month:  NAME_DD(A)_DD(B)_MM_NO     e.g. Mrs_Hiruni_Wasana_07_12_11_260001
-//   across months: NAME_DD(A)_MM(A)_DD(B)_MM(B)_NO
-function fileBase(d){
-  var nm=String(guestFull(d)||'guest').trim().replace(/[^A-Za-z0-9\u0E00-\u0E7F]+/g,'_').replace(/^_+|_+$/g,'')||'guest';
-  var a=String(d.arrival||'').slice(0,10).split('-'),b=String(d.departure||'').slice(0,10).split('-');
-  var parts=[nm];
-  if(a.length===3&&a[2]){
-    if(b.length===3&&b[2]){parts=parts.concat(a[1]===b[1]?[a[2],b[2],a[1]]:[a[2],a[1],b[2],b[1]])}
-    else parts=parts.concat([a[2],a[1]]);
-  }
-  parts.push(d.number||'');
-  return parts.join('_');
-}
-function fmtShort(s){var d=parseD(s);return d?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(d):''}
-function today(){return new Intl.DateTimeFormat('en-CA').format(new Date())}
-function company(){return Object.assign({},CO_DEFAULT,S.company||{})}
-// Itinerary number = YY + 4-digit running number (260001, 260002 ...). The count restarts at 0001 each new year.
-function nextNumber(){
-  var base=(+today().slice(2,4))*10000;
-  var used=S.itineraries.map(function(i){return +i.number||0}).filter(function(n){return n>base&&n<=base+9999});
-  return Math.max.apply(null,[base].concat(used))+1;
-}
-function clone(o){return JSON.parse(JSON.stringify(o))}
-function byName(a,b){return String(a.name||a.title||'').localeCompare(String(b.name||b.title||''))}
+const $ = (id) => document.getElementById(id);
 
-function newDraft(){
-  var pick=function(k){var s=S.snippets.filter(function(x){return x.kind===k})[0];return s?s.body:''};
-  return {number:nextNumber(),issueDate:today(),title:'',guestName:'',arrival:'',departure:'',adults:'',child:'',infant:'',guests:[],
-    days:[{text:''}],
-    transport:[],
-    hotels:[],
-    hotelCond:pick('hotelCond'),meals:pick('meals'),sim:'',agent:'',terms:pick('terms')};
-}
-
-/* ---------- document (preview, download, text) ---------- */
-// One line of a day:  "Pick-up (08.00 AM) | Safari"  -> time column + activity.
-//   "- text" = sub-item under the activity above.  A line "Pick-up (09.00 AM)" on its own
-//   followed by an activity (older itineraries) is joined to that activity.
-function parseDay(text){
-  var raw=lines(text),rows=[],i=0;
-  while(i<raw.length){
-    var l=raw[i],m;
-    if(/^-\s+/.test(l)){rows.push({sub:true,text:l.replace(/^-\s+/,'')});i++;continue}
-    if((m=/^pick[\s-]?up\s*(\([^()|]+\))$/i.exec(l))&&i+1<raw.length&&!/^-\s+/.test(raw[i+1])&&raw[i+1].indexOf(' | ')<0&&!/^pick[\s-]?up\s*\([^()|]+\)$/i.test(raw[i+1])){
-      rows.push({label:'Pick-up',time:m[1],text:raw[i+1]});i+=2;continue;
+/* ============ ที่เก็บข้อมูล (localStorage) ============ */
+function readStore() {
+    let raw = null;
+    try { raw = localStorage.getItem(KEY_DOCS); }
+    catch (e) { storageOk = false; return {}; }
+    if (!raw) return {};
+    try {
+        const o = JSON.parse(raw);
+        return (o && typeof o === 'object') ? o : {};
+    } catch (e) {
+        // ข้อมูลเสีย: เก็บของเดิมไว้อีกคีย์ก่อน ไม่เขียนทับทิ้ง
+        try { localStorage.setItem(KEY_DOCS + '.corrupt', raw); } catch (_) {}
+        toast('ข้อมูลที่เก็บไว้อ่านไม่ได้ เก็บสำเนาไว้แล้ว');
+        return {};
     }
-    var k=l.indexOf(' | ');
-    if(k>=0){
-      var head=l.slice(0,k).trim(),body=l.slice(k+3).trim(),p=head.indexOf('(');
-      rows.push(p>0?{label:head.slice(0,p).trim(),time:head.slice(p),text:body}:{label:'',time:head,text:body});
-    }else rows.push({text:l});
-    i++;
-  }
-  return rows;
 }
-function dayRowsHTML(text){
-  var prev='',out='';
-  parseDay(text).forEach(function(r){
-    if(r.sub){out+='<div class="p-ln"><div class="p-t"></div><div class="p-x p-sub">'+esc(r.text)+'</div></div>';return}
-    if(r.label&&r.label!==prev)out+='<div class="p-ln"><div class="p-t">'+esc(r.label)+'</div><div></div></div>';
-    prev=r.time?r.label:'';
-    out+='<div class="p-ln"><div class="p-t">'+esc(r.time||'')+'</div><div class="p-x">'+esc(r.text)+'</div></div>';
-  });
-  return out;
-}
-// Names of the people in the tour group, one per line in the form, numbered on the paper.
-function memberList(d){return (d.guests||[]).filter(function(g){return g&&(g.n||g.p)})}
-function membersHTML(d){
-  var m=memberList(d);if(!m.length)return '';
-  return '<hr class="p-rule"><div class="p-gl-title">Guest List</div><table class="p-tbl"><thead><tr><th>No.</th><th>Name</th><th>Passport No.</th></tr></thead><tbody>'+
-    m.map(function(g,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(g.n||'')+'</td><td>'+esc(g.p||'')+'</td></tr>'}).join('')+'</tbody></table>';
-}
-function docHTML(d,c){
-  var row=function(k,v){return '<div class="p-row"><div>'+esc(k)+'</div><div>'+esc(v)+'</div></div>'};
-  var days=(d.days||[]).map(function(x,i){return '<div class="p-day"><h4>'+esc(dayLabel(d,i))+'</h4>'+dayRowsHTML(x.text)+'</div>'}).join('');
-  var tr=(d.transport||[]).filter(function(p){return p.k||p.v}).map(function(p){return row(p.k,p.v)}).join('');
-  var ho=(d.hotels||[]).filter(function(p){return p.v}).map(function(p){return row(p.k+' Hotel',p.v)}).join('');
-  return '<div class="sheet" style="--wm-x:'+WM.x+'%;--wm-y:'+WM.y+'%;--wm-s:'+WM.size+'%;--wm-o:'+WM.opacity+'">'+
-   '<div class="p-top"><div class="p-brand">'+esc(c.brand)+'</div><div class="p-meta">'+esc(fmtDate(d.issueDate))+'<b>Itinerary Number</b><b>'+esc(d.number)+'</b></div></div>'+
-   '<div class="p-band"><h2>'+esc(c.name)+'</h2>'+(c.address?'<p>'+esc(c.address)+'</p>':'')+(c.phones?'<p>Phone '+esc(c.phones)+'</p>':'')+(c.email?'<p>Email '+esc(c.email)+'</p>':'')+(c.location?'<p>'+esc(c.location)+'</p>':'')+'</div>'+
-   '<div class="p-title">Travel Itinerary</div>'+
-   row('Guest Name',guestFull(d))+row('Arrival Date',fmtDate(d.arrival))+row('Departure Date',fmtDate(d.departure))+row('Number of Adults(>120cm)',d.adults)+(+d.child?row('Number of Children',d.child):'')+(+d.infant?row('Number of Infants',d.infant):'')+
-   '<hr class="p-rule"><div class="p-days">'+days+'</div>'+
-   (tr?'<hr class="p-rule">'+tr:'')+(ho?'<hr class="p-rule">'+ho:'')+
-   (d.hotelCond?'<div class="p-note">'+esc(d.hotelCond)+'</div>':'')+
-   membersHTML(d)+
-   (d.meals?'<hr class="p-rule">'+'<div class="p-row"><div>Meals</div><div class="p-pre">'+esc(d.meals)+'</div></div>':'')+
-   (d.sim?'<hr class="p-rule">'+row('Free Thailand Data Sim Cards',d.sim):'')+
-   (d.agent?'<hr class="p-rule">'+row('Booking Agent',d.agent):'')+
-   (d.terms?'<div class="p-terms p-pre">'+esc(d.terms)+'</div>':'')+
-   '<div class="p-thanks">Thank you for choosing '+esc(c.brand)+'!</div>'+(c.regNo?'<div class="p-reg">'+esc(c.regNo)+'</div>':'')+
-   '</div>';
-}
-var BAND_URL='/assets/header-band.jpg';
-// The downloaded .html must work offline, so the banner picture is embedded in it.
-var WM_URL='/assets/day-watermark.jpg';
-var _assetCache={};
-function assetData(url){
-  if(_assetCache[url])return _assetCache[url];
-  _assetCache[url]=fetch(url).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){
-    return new Promise(function(ok){var fr=new FileReader();fr.onload=function(){ok(fr.result)};fr.onerror=function(){ok(url)};fr.readAsDataURL(b)});
-  }).catch(function(){return url});
-  return _assetCache[url];
-}
-function bandData(){return assetData(BAND_URL)}
-function fullHTML(d,c,band,wm){
-  var css=$('#paper-css').textContent.split(BAND_URL).join(band||BAND_URL).split(WM_URL).join(wm||WM_URL);
-  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(fileBase(d))+'</title><style>body{margin:0;padding:16px;background:#eef1f7}'+css+'</style></head><body>'+docHTML(d,c)+'</body></html>';
-}
-function textExport(d,c){
-  var o=[c.name,'Itinerary Number '+d.number,'',
-    'Guest Name: '+guestFull(d),'Arrival Date: '+fmtDate(d.arrival),'Departure Date: '+fmtDate(d.departure),'Number of Adults(>120cm): '+d.adults].concat(+d.child?['Number of Children: '+d.child]:[],+d.infant?['Number of Infants: '+d.infant]:[],[]);
-  (d.days||[]).forEach(function(x,i){o.push(dayLabel(d,i));parseDay(x.text).forEach(function(r){o.push(r.sub?'    - '+r.text:'- '+((r.label?r.label+' ':'')+(r.time?r.time+' ':'')+r.text).trim())});o.push('')});
-  (d.transport||[]).forEach(function(p){if(p.k||p.v)o.push(p.k+': '+p.v)});o.push('');
-  (d.hotels||[]).forEach(function(p){if(p.v)o.push(p.k+' Hotel: '+p.v)});
-  if(d.hotelCond)o.push('',d.hotelCond);
-  if(memberList(d).length){o.push('','Guest List:');memberList(d).forEach(function(g,k){o.push((k+1)+'. '+(g.n||'')+(g.p?'  Passport: '+g.p:''))})}
-  if(d.meals)o.push('','Meals: '+d.meals);
-  if(d.sim)o.push('','Free Thailand Data Sim Cards: '+d.sim);
-  if(d.agent)o.push('Booking Agent: '+d.agent);
-  if(d.terms)o.push('',d.terms);
-  return o.join('\n');
-}
-
-/* ---------- data (Notion through /api) ---------- */
-function api(method,url,body){
-  var ctl=new AbortController();var tm=setTimeout(function(){ctl.abort()},25000);
-  return fetch(url,{method:method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:ctl.signal})
-    .then(function(r){return r.json().catch(function(){return {}}).then(function(j){
-      if(!r.ok){var er=new Error(j.error||('HTTP '+r.status));er.status=r.status;throw er}return j;
-    })})
-    .catch(function(e){if(e&&e.name==='AbortError')throw new Error('The request timed out. Check your connection and try again.');throw e})
-    .finally(function(){clearTimeout(tm)});
-}
-function loadKind(k){
-  var url=k==='itineraries'?'/api/itineraries':'/api/lib/'+k;
-  return api('GET',url).then(function(list){S[k]=list;S.loaded[k]=true;S.err=''}).catch(function(e){S.err=e.message}).then(function(){renderBanner();onData()});
-}
-function loadAll(){S.loadP=Promise.all(KINDS.map(loadKind));return S.loadP}
-// Wait until tours, hotels, standard text and the itinerary list have loaded, so forms never open with empty dropdowns.
-function ensureReady(){
-  return (S.loadP||Promise.resolve()).then(function(){
-    var need=KINDS.filter(function(k){return !S.loaded[k]});
-    return need.length?Promise.all(need.map(loadKind)):null;
-  });
-}
-function renderBanner(){
-  $('#banner').innerHTML=S.err?'<div class="banner">Could not reach Notion: '+esc(S.err)+'</div>':'';
-}
-
-/* ---------- views ---------- */
-var main=function(){return $('#main')};
-var VIEWS={};
-
-function renderNav(){
-  $('#nav').innerHTML=NAV.map(function(n){
-    var cur=(S.view===n[0]||(S.view==='editor'&&n[0]==='list'))?' aria-current="page"':'';
-    return '<button class="tab" data-go="'+n[0]+'"'+cur+'>'+esc(n[1])+'</button>';
-  }).join('');
-}
-function go(v,force){
-  if(S.view==='editor'&&S.dirty&&!force&&!window.confirm('You have unsaved changes. Leave without saving?'))return;
-  S.dirty=false;S.view=v;S.libEdit=null;
-  try{if(v!=='editor')history.replaceState(null,'','#'+v)}catch(e){}
-  render();window.scrollTo(0,0);
-  if(v==='list')loadKind('itineraries');else if(LIBS[v])loadKind(v);
-}
-var APP_TITLE=document.title;
-function render(){renderNav();if(S.view!=='editor')document.title=APP_TITLE;var v=VIEWS[S.view]||VIEWS.list;v.mount()}
-function onData(){var v=VIEWS[S.view];if(v&&v.refresh)v.refresh()}
-
-VIEWS.list={
-  mount:function(){
-    main().innerHTML='<div class="head"><h1>Itineraries</h1><div class="actions"><input id="q" type="search" placeholder="Search by guest name or number" value="'+esc(S.q)+'"><button class="btn primary" data-act="new">+ New itinerary</button></div></div><div id="rows"></div>';
-    this.refresh();
-  },
-  refresh:function(){
-    var r=$('#rows');if(!r)return;
-    if(!S.loaded.itineraries){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
-    var q=S.q.trim().toLowerCase();
-    var list=S.itineraries.slice().sort(function(a,b){return (+b.number||0)-(+a.number||0)}).filter(function(i){
-      return !q||String(i.number).indexOf(q)>-1||String(i.guestName||'').toLowerCase().indexOf(q)>-1});
-    if(!list.length){
-      r.innerHTML=S.itineraries.length?'<div class="empty">No itineraries match your search</div>':
-        '<div class="empty"><h2>No itineraries yet</h2><p>Click “New itinerary” to create the first one. Saved itineraries are stored in Notion and can be reopened, edited or duplicated.</p></div>';
-      return;
+function writeStore(obj) {
+    try {
+        const str = JSON.stringify(obj);
+        localStorage.setItem(KEY_DOCS, str);
+        lastSize = str.length;
+        storageOk = true;
+        return true;
+    } catch (e) {
+        storageOk = false;
+        return false;
     }
-    r.innerHTML=list.map(function(i){
-      return '<div class="row-card"><div class="num">'+esc(i.number)+'</div><div style="min-width:0"><b>'+esc(i.guestName||'(No guest name)')+'</b>'+
-        '<div class="sub">'+esc(fmtShort(i.arrival))+' – '+esc(fmtShort(i.departure))+' · '+esc(i.adults)+' adults · '+esc(i.days)+' days</div>'+
-        (i.hotelsText?'<div class="sub">'+esc(i.hotelsText)+'</div>':'')+'</div>'+
-        '<div class="actions"><button class="btn small" data-act="open" data-id="'+esc(i.id)+'">Open</button>'+
-        '<button class="btn small" data-act="dup" data-id="'+esc(i.id)+'">Duplicate</button></div></div>';
-    }).join('');
-  }
-};
+}
+/* อ่านล่าสุดจากที่เก็บ → แก้เฉพาะที่ต้องการ → เขียนกลับ (กันหลายแท็บเขียนทับกัน) */
+function mutate(fn) {
+    const s = readStore();
+    fn(s);
+    const ok = writeStore(s);
+    docs = ok ? s : Object.assign(docs, s);
+    return ok;
+}
+function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
-function tourOptions(){
-  var cats=TOUR_CATS.map(function(c){
-    var items=S.tours.filter(function(t){return (t.cat||'Other')===c[0]}).sort(byName);
-    return items.length?'<optgroup label="'+esc(c[1])+'">'+items.map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>'}).join('')+'</optgroup>':'';
-  }).join('');
-  return '<option value="">Choose a tour</option>'+cats;
+/* ============ ตัวเลข ============ */
+function formatNumber(num) {
+    return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
-// "09:30" or "16:00" from the time box -> "Pick-Up (09.30 AM)" / "Pick-Up (04.00 PM)"
-function pickLine(v){
-  var m=/^(\d{1,2}):(\d{2})/.exec(v||'');if(!m)return '';
-  var h=+m[1],h12=h%12||12;
-  return 'Pick-up ('+(h12<10?'0':'')+h12+'.'+m[2]+' '+(h<12?'AM':'PM')+')';
-}
-function snipSelect(field,kind){
-  var items=S.snippets.filter(function(s){return s.kind===kind});
-  if(!items.length)return '';
-  return '<select data-snip="'+field+'" aria-label="Insert standard text"><option value="">Insert standard text</option>'+items.map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.title)+'</option>'}).join('')+'</select>';
-}
-function daysHTML(){
-  var opts=tourOptions();
-  return S.draft.days.map(function(d,i){
-    return '<div class="day"><div class="day-head"><b>'+esc(dayLabel(S.draft,i))+'</b><select data-tour="'+i+'" aria-label="Choose tour for Day '+(i+1)+'">'+opts+'</select>'+
-      '<input type="time" data-pick="'+i+'" aria-label="Pick-up time for Day '+(i+1)+'" title="Pick-up time (optional). It is shown in the time column next to the tour.">'+
-      '<button class="btn small" data-act="addTour" data-i="'+i+'">Add</button>'+
-      (S.draft.days.length>1?'<button class="btn small danger" data-act="rmDay" data-i="'+i+'" aria-label="Remove Day '+(i+1)+'">Remove</button>':'')+'</div>'+
-      '<textarea id="day-'+i+'" data-day="'+i+'" rows="5" placeholder="One item per line. Time column: Pick-up (08.00 AM) | Safari   -   start a line with - for a sub-item">'+esc(d.text)+'</textarea></div>';
-  }).join('');
-}
-function selHTML(attrs,list,cur,ph){
-  var opts=list.slice();if(cur&&opts.indexOf(cur)<0)opts.unshift(cur);
-  return '<select '+attrs+'><option value="">'+ph+'</option>'+opts.map(function(o){return '<option'+(o===cur?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select>';
-}
-function pairsHTML(key){
-  var hot=key==='hotels';
-  if(!S.draft[key].length)return '<div class="sub">'+(hot?'No hotels added yet.':'No transport added yet.')+'</div>';
-  return S.draft[key].map(function(p,i){
-    var base='data-pair="'+key+'" data-i="'+i+'"';
-    var f1=hot?'<input '+base+' data-k="k" value="'+esc(p.k)+'" placeholder="City" aria-label="City">':selHTML(base+' data-k="k" aria-label="Route"',ROUTES,p.k,'Select route');
-    var f2=hot?'<input '+base+' data-k="v" value="'+esc(p.v)+'" placeholder="Hotel name" aria-label="Hotel name" list="hotelNames">':selHTML(base+' data-k="v" aria-label="Vehicle"',VEHICLES,p.v,'Select vehicle');
-    return '<div class="pair'+(hot?' short':'')+'">'+f1+f2+'<button class="btn small danger" data-act="rmPair" data-key="'+key+'" data-i="'+i+'" aria-label="Remove row">Remove</button></div>';
-  }).join('');
-}
-function guestsHTML(){
-  var g=S.draft.guests;
-  if(!g.length)return '<div class="sub">No guests added yet. Add each traveller with the passport number.</div>';
-  return '<div class="gl-row gl-head"><span>No.</span><span>Name</span><span>Passport no.</span><span></span></div>'+g.map(function(x,i){
-    return '<div class="gl-row"><span>'+(i+1)+'</span><input data-guest="'+i+'" data-k="n" value="'+esc(x.n)+'" placeholder="Full name" aria-label="Guest '+(i+1)+' name">'+
-      '<input data-guest="'+i+'" data-k="p" value="'+esc(x.p)+'" placeholder="Passport number" aria-label="Guest '+(i+1)+' passport number" autocomplete="off">'+
-      '<button class="btn small danger" data-act="rmGuest" data-i="'+i+'" aria-label="Remove guest '+(i+1)+'">Remove</button></div>';
-  }).join('');
-}
-function guestHint(){
-  var el=$('#gcount');if(!el||!S.draft)return;
-  var n=memberList(S.draft).length,t=(+S.draft.adults||0)+(+S.draft.child||0)+(+S.draft.infant||0);
-  el.textContent=n+' listed'+(t?' · '+t+' travellers in total':'');
-}
-function fld(label,id,f,type,extra){
-  return '<div><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+(type||'text')+'" data-f="'+f+'" value="'+esc(S.draft[f])+'" '+(extra||'')+'></div>';
-}
-function selFld(label,id,f,list,ph){
-  var cur=S.draft[f]||'',opts=list.slice();if(cur&&opts.indexOf(cur)<0)opts.unshift(cur);
-  return '<div><label for="'+id+'">'+label+'</label><select id="'+id+'" data-f="'+f+'"><option value="">'+ph+'</option>'+opts.map(function(o){return '<option'+(o===cur?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'</select></div>';
-}
-function area(label,id,f,kind,rows){
-  return '<div><div class="snip"><label for="'+id+'">'+label+'</label>'+(kind?snipSelect(f,kind):'')+'</div><textarea id="'+id+'" data-f="'+f+'" rows="'+(rows||4)+'">'+esc(S.draft[f])+'</textarea></div>';
-}
-VIEWS.editor={
-  mount:function(){
-    var d=S.draft;if(!d){go('list');return}
-    var hotelNames=S.hotels.slice().sort(byName).map(function(h){return '<option value="'+esc(h.name)+'">'}).join('');
-    main().innerHTML=
-     '<div class="head"><h1>'+(S.editId?'Edit itinerary '+esc(fileBase(d)):'New itinerary')+'</h1><div class="actions">'+
-       '<button class="btn" data-act="back">Back</button>'+
-       '<button class="btn primary" data-act="pdf">Download PDF</button>'+
-       '<button class="btn" data-act="print">Print</button>'+
-       '<button class="btn" data-act="download">Download .html</button>'+
-       '<button class="btn" data-act="copy">Copy as text</button>'+
-       (S.editId?'<button class="btn danger" data-act="delete">Delete itinerary</button>':'')+
-       '<button class="btn primary" data-act="save">Save</button></div></div>'+
-     '<datalist id="hotelNames">'+hotelNames+'</datalist>'+
-     '<div class="split"><div class="stack" id="form">'+
-       '<section class="card stack"><h2>Guest details</h2><div class="grid2">'+fld('Itinerary number','f-number','number','number')+fld('Issue date','f-issue','issueDate','date')+'</div>'+
-         '<div class="grid-name">'+selFld('Prefix','f-title','title',prefixList(),'(none)')+fld('Guest name','f-guest','guestName')+'</div>'+
-         '<div class="grid3">'+fld('Arrival date','f-arr','arrival','date')+fld('Departure date','f-dep','departure','date')+fld('Adults (>120 cm)','f-adults','adults','number','min="1"')+'</div><div class="grid2">'+fld('Children','f-child','child','number','min="0"')+fld('Infants','f-infant','infant','number','min="0"')+'</div>'+'</section>'+
-       '<section class="card stack"><div class="head" style="margin:0"><h2>Daily program</h2><button class="btn small" data-act="genDays">Set days from dates</button></div><div class="stack" id="days">'+daysHTML()+'</div><div><button class="btn small" data-act="addDay">+ Add day</button></div></section>'+
-       '<section class="card stack"><h2>Transport</h2><div id="transport">'+pairsHTML('transport')+'</div><div><button class="btn small" data-act="addPair" data-key="transport">+ Add transport</button></div></section>'+
-       '<section class="card stack"><h2>Hotels</h2><div id="hotels">'+pairsHTML('hotels')+'</div><div><button class="btn small" data-act="addPair" data-key="hotels">+ Add hotel</button></div>'+
-         area('Hotel booking conditions','f-hc','hotelCond','hotelCond',6)+'</section>'+
-       '<section class="card stack"><h2>Guest list</h2><div id="guests">'+guestsHTML()+'</div><div class="actions"><button class="btn small" data-act="addGuest">+ Add guest</button><span class="sub" id="gcount"></span></div></section>'+
-       '<section class="card stack"><h2>Meals & other</h2>'+area('Meals','f-meals','meals','meals',4)+
-         '<div class="grid2">'+fld('Free Thailand Data Sim Cards','f-sim','sim')+selFld('Booking Agent','f-agent','agent',agentList(),'Select agent')+'</div>'+
-         area('Terms & Conditions','f-terms','terms','terms',5)+'</section>'+
-     '</div><div class="preview-col"><div class="scroll-x" id="preview"></div></div></div>';
-    this.preview();
-  },
-  preview:function(){guestHint();var p=$('#preview');if(p)p.innerHTML=docHTML(S.draft,company());if(S.draft){document.title=fileBase(S.draft);var h=$('.head h1');if(h&&S.editId)h.textContent='Edit itinerary '+fileBase(S.draft)}},
-  refresh:null
-};
+function parseAmount(s) { return parseFloat(String(s || '').replace(/,/g, '')) || 0; }
 
-function libSummary(kind,it){
-  if(kind==='tours')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.cat||'Other')+'</span>'+esc(it.note||'')+'</div>';
-  if(kind==='hotels')return '<b>'+esc(it.name)+'</b><div class="sub"><span class="chip">'+esc(it.city||'Other')+'</span></div>';
-  var kl=(SNIP_KINDS.filter(function(k){return k[0]===it.kind})[0]||[0,'Other'])[1];
-  return '<b>'+esc(it.title)+'</b><div class="sub"><span class="chip">'+esc(kl)+'</span>'+esc(String(it.body||'').slice(0,110))+(String(it.body||'').length>110?'…':'')+'</div>';
-}
-function makeLib(kind){
-  var L=LIBS[kind];
-  return {
-    mount:function(){
-      var form=L.fields.map(function(f){
-        var id='lf-'+f[0];
-        if(f[2]==='select')return '<div><label for="'+id+'">'+f[1]+'</label><select id="'+id+'">'+f[3].map(function(o){return '<option value="'+o[0]+'">'+esc(o[1])+'</option>'}).join('')+'</select></div>';
-        if(f[2]==='textarea')return '<div><label for="'+id+'">'+f[1]+'</label><textarea id="'+id+'" rows="4"></textarea></div>';
-        return '<div><label for="'+id+'">'+f[1]+'</label><input id="'+id+'"></div>';
-      }).join('');
-      main().innerHTML='<div class="head"><div><h1>'+esc(L.title)+'</h1><div class="sub">'+esc(L.hint)+'</div></div></div>'+
-        '<section class="card stack" style="margin-bottom:16px"><h2 id="lib-form-title">'+esc(L.add)+'</h2>'+form+'<div class="actions"><button class="btn primary" data-act="libSave">Save</button><button class="btn" data-act="libCancel" id="libCancel" hidden>Cancel edit</button></div></section>'+
-        '<div class="lib-list" id="lib"></div>';
-      this.refresh();
-    },
-    refresh:function(){
-      var r=$('#lib');if(!r)return;
-      if(!S.loaded[kind]){r.innerHTML='<div class="empty">'+(S.err?'Could not load data':'Loading…')+'</div>';return}
-      var list=S[kind].slice().sort(byName);
-      if(!list.length){r.innerHTML='<div class="empty"><h2>No items yet</h2><p>Add the first one using the form above.</p></div>';return}
-      r.innerHTML=list.map(function(it){
-        return '<div class="row-card"><div style="min-width:0" class="pre">'+libSummary(kind,it)+'</div><div class="actions"><button class="btn small" data-act="libEdit" data-id="'+esc(it.id)+'">Edit</button><button class="btn small danger" data-act="libDel" data-id="'+esc(it.id)+'">Delete</button></div></div>';
-      }).join('');
-    }
-  };
-}
-VIEWS.tours=makeLib('tours');VIEWS.hotels=makeLib('hotels');VIEWS.snippets=makeLib('snippets');
+/* ใส่ลูกน้ำขณะพิมพ์ รับ - นำหน้า (ส่วนลด) และทศนิยมไม่เกิน 2 ตำแหน่ง */
+function formatInput(el) {
+    const raw = el.value;
+    const caret = el.selectionStart == null ? raw.length : el.selectionStart;
+    const keep = (c) => /[0-9.]/.test(c);
+    const before = [...raw.slice(0, caret)].filter(keep).length;
+    const neg = /^\s*-/.test(raw);
 
-/* ---------- actions ---------- */
-function guard(fn){
-  if(S.saving){toast('Please wait, still working…');return}S.saving=true;
-  Promise.resolve().then(fn).catch(function(e){toast('Failed: '+(e&&e.message||'please try again'),e&&e.status===409?7000:4000)}).then(function(){S.saving=false});
-}
-function openDraft(d,id){
-  // older itineraries kept the guest list as plain text (members); turn it into table rows
-  if(!Array.isArray(d.guests))d.guests=lines(d.members).map(function(n){return {n:n,p:''}});
-  delete d.members;
-  S.draft=d;S.editId=id||null;S.delArmed=false;S.dirty=false;S.view='editor';render();window.scrollTo(0,0)}
-function touch(){S.dirty=true;VIEWS.editor.preview()}
-// One day per date from arrival to departure. Runs by itself when either date changes (auto=true).
-function genDays(auto){
-  var a=parseD(S.draft.arrival),b=parseD(S.draft.departure);
-  if(!a||!b||b<a){if(!auto)toast('Enter valid arrival and departure dates first');else{$('#days').innerHTML=daysHTML();touch()}return}
-  var n=Math.min(Math.round((b-a)/864e5)+1,30);
-  var lost=S.draft.days.slice(Math.max(n,1)).filter(function(x){return x.text.trim()}).length;
-  if(lost&&!window.confirm('This removes '+lost+' day(s) that already have text. Continue?')){$('#days').innerHTML=daysHTML();touch();return}
-  while(S.draft.days.length<n)S.draft.days.push({text:''});
-  S.draft.days.length=Math.max(n,1);
-  $('#days').innerHTML=daysHTML();touch();
-}
-/* ---------- PDF (built right here in the browser, no outside library) ---------- */
-var PDF_W=595.28,PDF_H=841.89,PDF_M=36;
-var WIN1252={0x2022:0x95,0x2013:0x96,0x2014:0x97,0x2018:0x91,0x2019:0x92,0x201C:0x93,0x201D:0x94,0x2026:0x85,0x20AC:0x80,0x2122:0x99};
-var PDF_FONTS={F1:{n:'Helvetica'},F2:{n:'Helvetica-Bold',bold:1},F3:{n:'Times-BoldItalic',serif:1,bold:1,italic:1},F4:{n:'Helvetica-Oblique',italic:1}};
-var _mctx=null;
-function pdfWidth(s,f,size){
-  if(!_mctx)_mctx=document.createElement('canvas').getContext('2d');
-  var F=PDF_FONTS[f];
-  _mctx.font=(F.italic?'italic ':'')+(F.bold?'bold ':'')+'100px '+(F.serif?'"Times New Roman",Times,"Liberation Serif",serif':'Arial,Helvetica,"Liberation Sans",Arimo,sans-serif');
-  return _mctx.measureText(s).width*size/100;
-}
-function pdfCodes(s,st){
-  var out=[];
-  for(var i=0;i<s.length;i++){
-    var c=s.charCodeAt(i),b;
-    if(c>=32&&c<127)b=c;else if(c===0xa0||c===9)b=32;else if(c>=0xa1&&c<=0xff)b=c;else if(WIN1252[c])b=WIN1252[c];
-    else{b=63;if(st&&c>32)st.bad++}
-    out.push(b);
-  }
-  return out;
-}
-function pdfHex(a){var h='';for(var i=0;i<a.length;i++)h+=('0'+a[i].toString(16)).slice(-2);return h}
-function pdfColor(h){h=h.replace('#','');return [0,2,4].map(function(i){return (parseInt(h.substr(i,2),16)/255).toFixed(3)}).join(' ')}
-// size of a JPEG: [width,height,components] (null if it is not a plain JPEG)
-function jpegInfo(b){
-  if(!b||b[0]!==0xff||b[1]!==0xd8)return null;
-  var i=2;
-  while(i+9<b.length){
-    if(b[i]!==0xff){i++;continue}
-    var m=b[i+1];
-    if(m>=0xc0&&m<=0xcf&&m!==0xc4&&m!==0xc8&&m!==0xcc)return [b[i+7]*256+b[i+8],b[i+5]*256+b[i+6],b[i+9]];
-    i+=2+b[i+2]*256+b[i+3];
-  }
-  return null;
-}
-function buildPdf(d,c,jpg,wm){
-  var st={bad:0},pages=[],ops,y,CW=PDF_W-2*PDF_M,X0=PDF_M;
-  var info=jpegInfo(jpg);if(info&&info[2]!==1&&info[2]!==3)info=null;
-  var winfo=jpegInfo(wm);if(winfo&&winfo[2]!==1&&winfo[2]!==3)winfo=null;
-  var ranges={};   // per page: where the day section starts and ends (the watermark goes behind it)
-  function markRange(a,b){var k=pages.length-1,r=ranges[k];if(!r)ranges[k]={a:a,b:b};else{r.a=Math.min(r.a,a);r.b=Math.max(r.b,b)}}
-  function newPage(){ops=[];pages.push(ops);y=PDF_M}
-  function ensure(h){if(y+h>PDF_H-PDF_M)newPage()}
-  function txt(s,x,top,f,size,color,align){
-    if(!s)return;
-    var xx=x;if(align==='r')xx=x-pdfWidth(s,f,size);else if(align==='c')xx=x-pdfWidth(s,f,size)/2;
-    ops.push('BT /'+f+' '+size+' Tf '+pdfColor(color)+' rg '+xx.toFixed(2)+' '+(PDF_H-top-size*0.8).toFixed(2)+' Td <'+pdfHex(pdfCodes(s,st))+'> Tj ET');
-  }
-  function fillRect(x,top,w,h,color){ops.push(pdfColor(color)+' rg '+x.toFixed(2)+' '+(PDF_H-top-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re f')}
-  function boxRect(x,top,w,h,color){ops.push('[] 0 d '+pdfColor(color)+' RG 0.5 w '+x.toFixed(2)+' '+(PDF_H-top-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re S')}
-  function hline(top,color,wd,dash){ops.push((dash?'['+dash+'] 0 d ':'[] 0 d ')+pdfColor(color)+' RG '+wd+' w '+X0+' '+(PDF_H-top).toFixed(2)+' m '+(X0+CW).toFixed(2)+' '+(PDF_H-top).toFixed(2)+' l S')}
-  // word wrap; \n starts a new line
-  function wrap(s,f,size,maxW){
-    var out=[];
-    String(s==null?'':s).split('\n').forEach(function(par){
-      par=par.replace(/\s+$/,'');
-      if(!par){out.push('');return}
-      var cur='';
-      par.split(' ').forEach(function(w){
-        var t=cur?cur+' '+w:w;
-        if(pdfWidth(t,f,size)<=maxW){cur=t;return}
-        if(cur){out.push(cur);cur=''}
-        while(pdfWidth(w,f,size)>maxW&&w.length>1){
-          var k=w.length;while(k>1&&pdfWidth(w.slice(0,k),f,size)>maxW)k--;
-          out.push(w.slice(0,k));w=w.slice(k);
+    let v = raw.replace(/[^0-9.]/g, '');
+    const parts = v.split('.');
+    if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+    let [ip, dp] = v.split('.');
+    ip = ip.replace(/^0+(?=\d)/, '').slice(0, 12).replace(/\B(?=(\d{3})+(?!\d))/g, ',');   // สูงสุด 12 หลัก กันตัวเลขใหญ่จนคำนวณคลาดเคลื่อน
+    let out = ip;
+    if (dp !== undefined) out += '.' + dp.slice(0, 2);
+    if (neg) out = '-' + out;
+    el.value = out;
+
+    let pos = neg ? 1 : 0;
+    if (before > 0) {
+        let n = 0;
+        for (pos = 0; pos < out.length; pos++) {
+            if (keep(out[pos])) n++;
+            if (n === before) { pos++; break; }
         }
-        cur=w;
-      });
-      out.push(cur);
+    }
+    try { el.setSelectionRange(pos, pos); } catch (e) {}
+}
+
+function calculate() {
+    let grand = 0;   // คิดเป็นสตางค์ (จำนวนเต็ม) กันเศษทศนิยมเพี้ยน
+    SECTIONS.forEach((id) => {
+        const tb = $(id);
+        let sub = 0;
+        tb.querySelectorAll('.auto-calc').forEach((i) => { sub += Math.round(parseAmount(i.value) * 100); });
+        const el = tb.querySelector('.subtotal-display');
+        if (el) el.textContent = formatNumber(sub / 100);
+        grand += sub;
+    });
+    $('t_grand').textContent = formatNumber(grand / 100);
+}
+
+/* ============ แถวรายการ ============ */
+function makeRow(secId, desc, amt, isFirst, type) {
+    const tr = document.createElement('tr');
+    tr.className = 'item-row';
+    const hasType = secId === 'sec-trans';   // ช่อง Type มีเฉพาะหมวด Transportation
+    tr.innerHTML =
+        '<td' + (hasType ? '' : ' colspan="2"') + '><span class="btn-remove no-print" title="Remove Row">&times;</span>' +
+        '<input type="text" data-ac="name" autocomplete="off"></td>' +
+        (hasType ? '<td><input type="text" class="row-type" data-ac="type" autocomplete="off" placeholder="Type"></td>' : '') +
+        '<td><input type="text" inputmode="decimal" class="auto-calc" placeholder="0"></td>';
+    const d = tr.querySelector('[data-ac="name"]');
+    if (hasType) tr.querySelector('.row-type').value = type || '';
+    d.placeholder = isFirst ? PLACEHOLDER[secId] : 'Description';
+    d.value = desc || '';
+    const a = tr.querySelector('.auto-calc');
+    a.value = amt || '';
+    tr.querySelector('.btn-remove').addEventListener('click', function () { removeRow(this); });
+    a.addEventListener('input', function () { formatInput(this); calculate(); });
+    return tr;
+}
+function addRow(secId, desc, amt, type) {
+    const tb = $(secId);
+    const isFirst = tb.querySelectorAll('.item-row').length === 0;
+    tb.insertBefore(makeRow(secId, desc, amt, isFirst, type), tb.querySelector('.subtotal-row'));
+    if (!loading) scheduleSave();
+}
+function removeRow(el) {
+    const tr = el.closest('tr'), tb = tr.closest('tbody'), secId = tb.id;
+    const desc = tr.querySelector('[data-ac="name"]').value, amt = tr.querySelector('.auto-calc').value;
+    const typeEl = tr.querySelector('.row-type'), type = typeEl ? typeEl.value : '';
+    const next = tr.nextElementSibling;
+    tr.remove();
+    calculate();
+    scheduleSave();
+    if (desc || amt || type) {
+        toast('ลบแถวแล้ว', 'ย้อนกลับ', () => {
+            tb.insertBefore(makeRow(secId, desc, amt, false, type), (next && next.parentNode === tb) ? next : tb.querySelector('.subtotal-row'));
+            calculate();
+            scheduleSave();
+        });
+    }
+}
+
+/* ============ เก็บค่าจากฟอร์ม / ใส่ค่าลงฟอร์ม ============ */
+function collect() {
+    const sections = {};
+    SECTIONS.forEach((id) => {
+        sections[id] = [...$(id).querySelectorAll('.item-row')].map((r) => ({
+            d: r.querySelector('[data-ac="name"]').value,
+            t: (r.querySelector('.row-type') || {}).value || '',
+            a: r.querySelector('.auto-calc').value
+        }));
+    });
+    return {
+        id: curId,
+        createdAt: curCreatedAt,
+        updatedAt: Date.now(),
+        company: $('company-name-input').value,
+        address: $('address').innerText.replace(/\n{3,}/g, '\n\n').trim(),
+        date: $('current-date').value,
+        ref: $('ref-input').value,
+        customer: $('customer-name-input').value,
+        status: $('status-select').value,
+        travel: [...document.querySelectorAll('.date-box')].map((b) => b.value),
+        adults: $('adults-input').value,
+        children: $('children-input').value,
+        infants: $('infants-input').value,
+        sections
+    };
+}
+
+function populate(d) {
+    loading = true;
+    curId = d.id;
+    curCreatedAt = d.createdAt || Date.now();
+    $('company-name-input').value = d.company || '';
+    $('address').innerText = d.address || '';
+    $('current-date').value = d.date || '';
+    $('ref-input').value = d.ref || '';
+    $('customer-name-input').value = d.customer || '';
+    $('status-select').value = STATUSES.includes(d.status) ? d.status : 'Draft';
+    document.querySelectorAll('.date-box').forEach((b, i) => { b.value = (d.travel && d.travel[i]) || ''; });
+    $('adults-input').value = d.adults || '';
+    $('children-input').value = d.children || '';
+    $('infants-input').value = d.infants || '';
+    SECTIONS.forEach((id) => {
+        $(id).querySelectorAll('.item-row').forEach((r) => r.remove());
+        const rows = (d.sections && d.sections[id]) || [];
+        (rows.length ? rows : [{ d: '', a: '' }]).forEach((r) => addRow(id, r.d, r.a, r.t));
+    });
+    $('footer-company-name').textContent = ($('company-name-input').value) + ' - Tour Cost Summary';
+    calculate();
+    calcNights();
+    fitCompanyName();
+    updateFileTitle();
+    loading = false;
+    dirty = false;
+    loadedAt = d.updatedAt || 0;
+    try { localStorage.setItem(KEY_CUR, curId); } catch (e) {}
+    checkRefDup();
+    renderList();
+}
+
+function blankDoc() {
+    const t = new Date();
+    return {
+        id: newId(), createdAt: Date.now(), updatedAt: Date.now(),
+        company: DEFAULT_COMPANY, address: DEFAULT_ADDRESS,
+        date: t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+        ref: nextRef(), customer: '', status: 'Draft', travel: ['', '', '', '', String(t.getFullYear())],
+        adults: '', children: '', infants: '',
+        sections: { 'sec-acc': [{ d: '', a: '' }], 'sec-tour': [{ d: '', a: '' }], 'sec-trans': [{ d: '', a: '' }], 'sec-other': [{ d: '', a: '' }] }
+    };
+}
+function nextRef() {
+    let best = null;
+    Object.values(docs).forEach((d) => {
+        const m = /^(.*?)(\d+)$/.exec(String(d.ref || '').trim());
+        if (m) {
+            const n = parseInt(m[2], 10);
+            if (!best || n > best.n) best = { p: m[1], n, w: m[2].length };
+        }
+    });
+    if (!best) return 'GP-001';
+    return best.p + String(best.n + 1).padStart(best.w, '0');
+}
+function isBlank(d) {
+    if (!d) return false;
+    if ((d.customer || '').trim()) return false;
+    const tr = d.travel || [];
+    if ([0, 1, 2, 3].some((i) => (tr[i] || '').trim())) return false;
+    if ((d.adults || '').trim() || (d.children || '').trim() || (d.infants || '').trim()) return false;
+    if (d.status && d.status !== 'Draft') return false;
+    return Object.values(d.sections || {}).every((rows) => rows.every((r) => !(r.d || '').trim() && !(r.a || '').trim() && !(r.t || '').trim()));
+}
+function checkRefDup() {
+    const ref = $('ref-input').value.trim().toLowerCase();
+    const dup = ref && Object.values(docs).some((d) => d.id !== curId && String(d.ref || '').trim().toLowerCase() === ref);
+    $('ref-warn').hidden = !dup;
+}
+function sumDoc(d) {
+    let c = 0;
+    Object.values(d.sections || {}).forEach((rows) => rows.forEach((r) => { c += Math.round(parseAmount(r.a) * 100); }));
+    return c / 100;
+}
+
+/* ============ บันทึกอัตโนมัติ ============ */
+function scheduleSave() {
+    if (loading || !curId) return;
+    dirty = true;
+    setStatus('กำลังบันทึก…');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 350);
+}
+function saveNow() {
+    clearTimeout(saveTimer);
+    if (loading || !curId || !dirty) return;   // ไม่มีการแก้ไขในหน้านี้ ห้ามเขียนทับของที่อาจใหม่กว่า
+    const d = collect();
+    let note = '';
+    // อีกหน้าต่างแก้ใบนี้ไปแล้วหลังจากที่หน้านี้เปิดมา → ไม่เขียนทับ เก็บของหน้านี้เป็นสำเนาใหม่แทน
+    const stored = readStore()[curId];
+    if (stored && (stored.updatedAt || 0) > loadedAt) {
+        docs = readStore();
+        d.id = newId();
+        d.createdAt = d.updatedAt = Date.now();
+        d.ref = nextRef();
+        d.customer = (d.customer ? d.customer + ' ' : '') + '(กู้คืน)';
+        curId = d.id; curCreatedAt = d.createdAt;
+        $('ref-input').value = d.ref;
+        $('customer-name-input').value = d.customer;
+        try { localStorage.setItem(KEY_CUR, curId); } catch (e) {}
+        note = 'ใบนี้ถูกแก้จากอีกหน้าต่างไปแล้ว จึงเก็บข้อมูลหน้านี้เป็นสำเนาใหม่ ' + d.ref;
+        updateFileTitle();
+    }
+    const ok = mutate((s) => { s[d.id] = d; });
+    if (ok) { dirty = false; loadedAt = d.updatedAt; setStatus('บันทึกอัตโนมัติแล้ว ' + new Date().toLocaleTimeString('en-GB')); }
+    else setStatus('บันทึกลงเครื่องไม่ได้!', true);
+    if (note) toast(note);
+    else if (ok && lastSize > 3500000 && !sizeWarned) { sizeWarned = true; toast('ที่เก็บข้อมูลในเบราว์เซอร์ใกล้เต็ม กรุณาสำรองข้อมูลแล้วลบใบเก่าที่ไม่ใช้'); }
+    $('storage-banner').hidden = ok;
+    checkRefDup();
+    renderList();
+    if (ok && navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(() => {}); }
+}
+function setStatus(msg, bad) {
+    const el = $('status');
+    el.textContent = msg;
+    el.className = 'status ' + (bad ? 'bad' : 'ok');
+}
+
+/* ============ จัดการเอกสาร ============ */
+function dropIfBlankCurrent(exceptId) {
+    if (curId && curId !== exceptId && isBlank(docs[curId]) && Object.keys(docs).length > 1) {
+        const id = curId;
+        mutate((s) => { delete s[id]; });
+    }
+}
+function openDoc(id) {
+    saveNow();
+    const d = docs[id];
+    if (!d) return;
+    dropIfBlankCurrent(id);
+    populate(docs[id]);
+    toggleSidebar(false);
+    window.scrollTo(0, 0);
+}
+function newDoc() {
+    saveNow();
+    if (isBlank(docs[curId])) { toggleSidebar(false); $('customer-name-input').focus(); return; }
+    const d = blankDoc();
+    mutate((s) => { s[d.id] = d; });
+    populate(d);
+    toggleSidebar(false);
+    $('customer-name-input').focus();
+}
+function duplicateDoc(id) {
+    saveNow();
+    const src = docs[id];
+    if (!src) return;
+    const copy = JSON.parse(JSON.stringify(src));
+    copy.id = newId();
+    copy.createdAt = copy.updatedAt = Date.now();
+    copy.ref = nextRef();
+    copy.status = 'Draft';
+    copy.date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    mutate((s) => { s[copy.id] = copy; });
+    populate(copy);
+    toast('คัดลอกเป็นใบใหม่แล้ว (' + copy.ref + ')');
+}
+function deleteDoc(id) {
+    saveNow();
+    const d = docs[id];
+    if (!d) return;
+    const label = (d.ref || '') + ' ' + (d.customer || '');
+    if (!confirm('ลบใบ ' + label.trim() + ' ?')) return;
+    const backup = JSON.parse(JSON.stringify(d));
+    mutate((s) => { delete s[id]; });
+    if (id === curId) {
+        const rest = sortedDocs();
+        if (rest.length) populate(rest[0]);
+        else { const nd = blankDoc(); mutate((s) => { s[nd.id] = nd; }); populate(nd); }
+    } else renderList();
+    toast('ลบแล้ว', 'ย้อนกลับ', () => {
+        mutate((s) => { s[backup.id] = backup; });
+        renderList();
+        toast('กู้คืนแล้ว');
+    });
+}
+function sortedDocs() {
+    return Object.values(docs).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+}
+
+/* ============ แถบรายการด้านซ้าย ============ */
+function renderList() {
+    const box = $('doc-list');
+    const q = ($('search').value || '').trim().toLowerCase();
+    box.textContent = '';
+    const sf = $('status-filter').value;
+    const list = sortedDocs().filter((d) => (!q || ((d.ref || '') + ' ' + (d.customer || '')).toLowerCase().includes(q)) && (!sf || (STATUSES.includes(d.status) ? d.status : 'Draft') === sf));
+    if (!list.length) {
+        const e = document.createElement('div');
+        e.className = 'list-empty';
+        e.textContent = q ? 'ไม่พบที่ค้นหา' : 'ยังไม่มีเอกสาร';
+        box.appendChild(e);
+    }
+    list.forEach((d) => {
+        const it = document.createElement('div');
+        it.className = 'doc-item' + (d.id === curId ? ' active' : '');
+        it.addEventListener('click', () => { if (d.id !== curId) openDoc(d.id); else toggleSidebar(false); });
+
+        const top = document.createElement('div'); top.className = 'di-top';
+        const ref = document.createElement('span'); ref.className = 'di-ref'; ref.textContent = d.ref || '(ไม่มี Ref)';
+        const tot = document.createElement('span'); tot.className = 'di-total'; tot.textContent = formatNumber(sumDoc(d));
+        const sv = STATUSES.includes(d.status) ? d.status : 'Draft';
+        const st = document.createElement('span'); st.className = 'st st-' + sv; st.textContent = sv;
+        const lt = document.createElement('span'); lt.className = 'di-lt'; lt.append(ref, st);
+        top.append(lt, tot);
+
+        const nm = document.createElement('div');
+        nm.className = 'di-name' + ((d.customer || '').trim() ? '' : ' empty');
+        nm.textContent = (d.customer || '').trim() || '(ยังไม่ใส่ชื่อลูกค้า)';
+
+        const meta = document.createElement('div'); meta.className = 'di-meta';
+        const tr = d.travel || [];
+        const tText = (tr[0] || tr[1] || tr[2] || tr[3]) ? `เดินทาง ${tr[0] || '--'}/${tr[1] || '--'} - ${tr[2] || '--'}/${tr[3] || '--'}` : 'แก้ไข ' + shortTime(d.updatedAt);
+        const left = document.createElement('span'); left.textContent = tText;
+        const act = document.createElement('span'); act.className = 'di-actions';
+        const dup = document.createElement('button'); dup.textContent = 'คัดลอก';
+        dup.addEventListener('click', (e) => { e.stopPropagation(); duplicateDoc(d.id); });
+        const del = document.createElement('button'); del.className = 'del'; del.textContent = 'ลบ';
+        del.addEventListener('click', (e) => { e.stopPropagation(); deleteDoc(d.id); });
+        act.append(dup, del);
+        meta.append(left, act);
+
+        it.append(top, nm, meta);
+        box.appendChild(it);
+    });
+    renderBackupNote();
+}
+function shortTime(ts) {
+    const t = new Date(ts || Date.now());
+    return t.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+function toggleSidebar(open) {
+    $('sidebar').classList.toggle('open', open);
+    $('backdrop').classList.toggle('open', open);
+}
+
+/* ============ สำรอง / นำเข้า ============ */
+function renderBackupNote() {
+    const el = $('backup-note');
+    let last = 0;
+    try { last = parseInt(localStorage.getItem(KEY_BACKUP) || '0', 10); } catch (e) {}
+    const n = Object.keys(docs).length;
+    if (!last) { el.textContent = 'ยังไม่เคยสำรองข้อมูล (' + n + ' ใบในเครื่องนี้)'; el.className = 'sb-note warn'; }
+    else {
+        const days = Math.floor((Date.now() - last) / 86400000);
+        el.textContent = 'สำรองล่าสุด ' + shortTime(last) + ' · ' + n + ' ใบในเครื่องนี้';
+        el.className = 'sb-note' + (days >= 7 ? ' warn' : '');
+    }
+}
+function download(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function stamp() { return new Date().toISOString().slice(0, 10); }
+function safeName(s) { return String(s || '').replace(/[\\/:*?"<>|]/g, '').trim(); }
+function exportAll() {
+    saveNow();
+    const all = sortedDocs();
+    if (!all.length) { toast('ยังไม่มีเอกสารให้สำรอง'); return; }
+    download('cost-summary-backup-' + stamp() + '.json', JSON.stringify({ app: 'tour-cost-summary', version: 1, exportedAt: new Date().toISOString(), docs: all, master: readMaster() }, null, 1));
+    try { localStorage.setItem(KEY_BACKUP, String(Date.now())); } catch (e) {}
+    renderBackupNote();
+    toast('สำรอง ' + all.length + ' ใบแล้ว');
+}
+function exportCurrent() {
+    saveNow();
+    const d = docs[curId];
+    if (!d) return;
+    download((safeName(d.ref) || 'doc') + '_' + (safeName(d.customer) || 'Cost Summary') + '.json',
+        JSON.stringify({ app: 'tour-cost-summary', version: 1, exportedAt: new Date().toISOString(), docs: [d] }, null, 1));
+}
+function normalizeDoc(x) {
+    if (!x || typeof x !== 'object' || !x.sections || typeof x.sections !== 'object') return null;
+    const str = (v) => (v == null ? '' : String(v));
+    const out = {
+        id: (str(x.id) && !/^(__proto__|constructor|prototype)$/.test(str(x.id))) ? str(x.id) : newId(),
+        createdAt: Number(x.createdAt) || Date.now(),
+        updatedAt: Number(x.updatedAt) || Date.now(),
+        company: str(x.company), address: str(x.address), date: str(x.date), ref: str(x.ref), customer: str(x.customer), status: STATUSES.includes(x.status) ? x.status : 'Draft',
+        travel: Array.isArray(x.travel) ? x.travel.slice(0, 5).map(str) : [],
+        adults: str(x.adults), children: str(x.children), infants: str(x.infants),
+        sections: {}
+    };
+    SECTIONS.forEach((id) => {
+        const rows = Array.isArray(x.sections[id]) ? x.sections[id] : [];
+        out.sections[id] = rows.map((r) => ({ d: str(r && r.d), t: str(r && r.t), a: str(r && r.a) }));
     });
     return out;
-  }
-  function row(k,v){
-    var size=9.5,lead=13,vx=X0+CW*0.4,ls=wrap(v,'F1',size,CW*0.6-4);
-    ensure(ls.length*lead+6);
-    txt(k,X0,y+3,'F1',size,'#2b3350');
-    ls.forEach(function(l,i){txt(l,vx,y+3+i*lead,'F1',size,'#0e1530')});
-    y+=ls.length*lead+6;
-  }
-  function rule(){y+=7;ensure(2);hline(y,'#b8c0d4',0.6,'3 2');y+=9}
-  function block(s,f,size,color,lead){
-    wrap(s,f,size,CW).forEach(function(l){ensure(lead);txt(l,X0,y,f,size,color);y+=lead});
-  }
-
-  newPage();
-  // top: brand + issue date / number
-  txt(c.brand,X0,y,'F3',24,'#2557c7');
-  txt(fmtDate(d.issueDate),X0+CW,y,'F1',8.5,'#4a5470','r');
-  txt('Itinerary Number',X0+CW,y+12,'F2',9,'#0e1530','r');
-  txt(String(d.number==null?'':d.number),X0+CW,y+23,'F2',9,'#0e1530','r');
-  y+=40;
-  // company band with the banner picture behind the text
-  var bh=CW*189/898;
-  if(info)ops.push('q '+CW.toFixed(2)+' 0 0 '+bh.toFixed(2)+' '+X0+' '+(PDF_H-y-bh).toFixed(2)+' cm /Im1 Do Q');
-  else fillRect(X0,y,CW,bh,'#f1f5fc');
-  var bl=[c.address,c.phones?'Phone '+c.phones:'',c.email?'Email '+c.email:'',c.location].filter(Boolean);
-  var bt=y+Math.max(6,(bh-(15*1.25+8+bl.length*13))/2);
-  txt(c.name,X0+16,bt,'F2',15,'#1b3f8f');
-  bl.forEach(function(l,i){txt(l,X0+16,bt+15*1.25+8+i*13,'F2',8.5,'#000000')});
-  y+=bh+10;
-  // title
-  hline(y,'#2e8fd6',0.8);txt('Travel Itinerary',X0,y+7,'F2',13,'#0e1530');hline(y+27,'#2e8fd6',0.8);y+=33;
-  row('Guest Name',guestFull(d));row('Arrival Date',fmtDate(d.arrival));row('Departure Date',fmtDate(d.departure));
-  row('Number of Adults(>120cm)',String(d.adults==null?'':d.adults));
-  if(+d.child)row('Number of Children',String(d.child));
-  if(+d.infant)row('Number of Infants',String(d.infant));
-  rule();
-  // days
-  var TW=88,ax=X0+TW+8,aw=CW-TW-8;
-  (d.days||[]).forEach(function(day,i){
-    ensure(34);
-    var t0=y;
-    txt(dayLabel(d,i),X0,y,'F2',10,'#0e1530');y+=16;markRange(t0,y);
-    var prev='';
-    parseDay(day.text).forEach(function(r){
-      var lead=12.5,size=9.5,tl=[],xl,bx=ax,mark='•';
-      if(r.sub){bx=ax+16;mark='-'}
-      if(r.label&&r.label!==prev){ensure(lead);var l0=y;txt(r.label,X0,y,'F1',size,'#2b3350');y+=lead;markRange(l0,y)}
-      if(!r.sub)prev=r.time?r.label:'';
-      tl=wrap(r.time||'','F1',size,TW);
-      xl=wrap(r.text,'F1',size,aw-(bx-ax)-10);
-      var n=Math.max(tl.length,xl.length,1);
-      ensure(n*lead+2);
-      var r0=y;
-      tl.forEach(function(l,k){txt(l,X0,y+k*lead,'F1',size,'#2b3350')});
-      txt(mark,bx,y,'F1',size,'#0e1530');
-      xl.forEach(function(l,k){txt(l,bx+10,y+k*lead,'F1',size,'#0e1530')});
-      y+=n*lead+2;markRange(r0,y);
-    });
-    y+=12;
-  });
-  var tr=(d.transport||[]).filter(function(p){return p.k||p.v}),ho=(d.hotels||[]).filter(function(p){return p.v});
-  if(tr.length){rule();tr.forEach(function(p){row(p.k,p.v)})}
-  if(ho.length){rule();ho.forEach(function(p){row(p.k+' Hotel',p.v)})}
-  if(d.hotelCond){y+=6;block(d.hotelCond,'F4',8.5,'#3b4460',11)}
-  // guest list table
-  var gl=memberList(d);
-  if(gl.length){
-    rule();ensure(60);txt('Guest List',X0,y,'F2',10,'#0e1530');y+=17;
-    var cw=[34,CW-34-170,170],size=9.5,lead=12.5;
-    var cells=function(a,bold,fill){
-      var parts=a.map(function(t,k){return wrap(t,bold?'F2':'F1',size,cw[k]-12)});
-      var n=Math.max(parts[0].length,parts[1].length,parts[2].length,1),h=n*lead+8;
-      ensure(h);
-      if(fill)fillRect(X0,y,CW,h,fill);
-      var x=X0;
-      for(var k=0;k<3;k++){
-        boxRect(x,y,cw[k],h,'#b8c0d4');
-        parts[k].forEach(function(l,j){txt(l,k===0?x+cw[0]/2:x+6,y+4+j*lead,bold?'F2':'F1',size,'#0e1530',k===0?'c':'l')});
-        x+=cw[k];
-      }
-      y+=h;
+}
+function importFile(input) {
+    const f = input.files && input.files[0];
+    input.value = '';
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+        let data;
+        try { data = JSON.parse(rd.result); } catch (e) { toast('ไฟล์นี้ไม่ใช่ไฟล์สำรองที่ถูกต้อง'); return; }
+        const list = (Array.isArray(data) ? data : (data && data.docs)) || [];
+        const incoming = list.map(normalizeDoc).filter(Boolean);
+        if (!incoming.length) { toast('ไม่พบเอกสารในไฟล์นี้'); return; }
+        saveNow();
+        if (data && data.master) {
+            const inM = normMaster(data.master);
+            mutateMaster((m) => {
+                SECTIONS.forEach((sec) => inM[sec].forEach((it) => {
+                    const ex = m[sec].find((x) => x.n.toLowerCase() === it.n.toLowerCase());
+                    if (!ex) m[sec].push(it);
+                    else it.t.forEach((t) => { if (!ex.t.some((x) => x.toLowerCase() === t.toLowerCase())) ex.t.push(t); });
+                }));
+            });
+        }
+        let added = 0, updated = 0, skipped = 0;
+        const ok = mutate((s) => {
+            incoming.forEach((d) => {
+                const ex = s[d.id];
+                if (!ex) { s[d.id] = d; added++; }
+                else if ((d.updatedAt || 0) > (ex.updatedAt || 0)) { s[d.id] = d; updated++; }
+                else skipped++;
+            });
+        });
+        if (!ok) { toast('บันทึกลงเครื่องไม่ได้'); return; }
+        if (docs[curId]) populate(docs[curId]); else renderList();
+        toast('นำเข้า: เพิ่มใหม่ ' + added + ' · อัปเดต ' + updated + (skipped ? ' · ข้าม ' + skipped + ' (ในเครื่องใหม่กว่า)' : ''));
     };
-    cells(['No.','Name','Passport No.'],true,'#f1f5fc');
-    gl.forEach(function(g,i){cells([String(i+1),g.n||'',g.p||''],false)});
-    y+=4;
-  }
-  if(d.meals){rule();row('Meals',d.meals)}
-  if(d.sim){rule();row('Free Thailand Data Sim Cards',d.sim)}
-  if(d.agent){rule();row('Booking Agent',d.agent)}
-  if(d.terms){y+=8;block(d.terms,'F1',8.5,'#555d75',11)}
-  y+=10;ensure(30);
-  txt('Thank you for choosing '+c.brand+'!',X0+CW/2,y,'F2',10.5,'#3b4460','c');y+=16;
-  if(c.regNo){var rl=wrap(c.regNo,'F1',8.5,CW);rl.forEach(function(l){ensure(11);txt(l,X0+CW/2,y,'F1',8.5,'#555d75','c');y+=11})}
-
-  // watermark picture behind the day section of each page (same look as the paper preview: right-bottom, cover, clipped)
-  if(winfo)Object.keys(ranges).forEach(function(k){
-    var r=ranges[k],top=r.a-2,H=r.b-top+4,dw=CW*WM.size/100,dh=winfo[1]*dw/winfo[0];
-    var ix=X0+(WM.x/100)*(CW-dw),iy=top+(WM.y/100)*(H-dh),cby=PDF_H-(top+H),iby=PDF_H-(iy+dh);
-    pages[k].unshift('q '+X0+' '+cby.toFixed(2)+' '+CW.toFixed(2)+' '+H.toFixed(2)+' re W n /GS1 gs '+dw.toFixed(2)+' 0 0 '+dh.toFixed(2)+' '+ix.toFixed(2)+' '+iby.toFixed(2)+' cm /Im2 Do Q');
-  });
-  // assemble the file
-  var chunks=[],pos=0,offs=[];
-  function bytes(s){var a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&255;return a}
-  function put(x){var b=typeof x==='string'?bytes(x):x;chunks.push(b);pos+=b.length}
-  function obj(n,body){offs[n]=pos;put(n+' 0 obj\n'+body+'\nendobj\n')}
-  var imgs=[];if(info)imgs.push({n:'Im1',i:info,b:jpg});if(winfo)imgs.push({n:'Im2',i:winfo,b:wm});
-  var nPages=pages.length,first=7+imgs.length,kids=[];
-  put('%PDF-1.4\n%\xe2\xe3\xcf\xd3\n');
-  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
-  for(var p=0;p<nPages;p++)kids.push((first+p*2)+' 0 R');
-  obj(2,'<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+nPages+' >>');
-  ['F1','F2','F3','F4'].forEach(function(f,i){obj(3+i,'<< /Type /Font /Subtype /Type1 /BaseFont /'+PDF_FONTS[f].n+' /Encoding /WinAnsiEncoding >>')});
-  imgs.forEach(function(m,k){
-    offs[7+k]=pos;
-    put((7+k)+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+m.i[0]+' /Height '+m.i[1]+' /ColorSpace /'+(m.i[2]===1?'DeviceGray':'DeviceRGB')+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+m.b.length+' >>\nstream\n');
-    put(m.b);put('\nendstream\nendobj\n');
-  });
-  var res='<< /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> /ExtGState << /GS1 << /ca '+WM.opacity+' >> >>'+(imgs.length?' /XObject << '+imgs.map(function(m,k){return '/'+m.n+' '+(7+k)+' 0 R'}).join(' ')+' >>':'')+' >>';
-  pages.forEach(function(o,i){
-    var pn=first+i*2,cn=pn+1,s=o.join('\n');
-    obj(pn,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PDF_W+' '+PDF_H+'] /Resources '+res+' /Contents '+cn+' 0 R >>');
-    obj(cn,'<< /Length '+s.length+' >>\nstream\n'+s+'\nendstream');
-  });
-  var total=first+nPages*2;
-  obj(total,'<< /Title ('+fileBase(d).replace(/[^\x20-\x7e]/g,'').replace(/[()\\]/g,'')+') /Producer (PRITE) >>');
-  var xr=pos,x='xref\n0 '+(total+1)+'\n0000000000 65535 f \n';
-  for(var n=1;n<=total;n++)x+=('0000000000'+(offs[n]||0)).slice(-10)+' 00000 n \n';
-  put(x+'trailer\n<< /Size '+(total+1)+' /Root 1 0 R /Info '+total+' 0 R >>\nstartxref\n'+xr+'\n%%EOF');
-  var out=new Uint8Array(pos),at=0;chunks.forEach(function(b){out.set(b,at);at+=b.length});
-  return {bytes:out,bad:st.bad,pages:nPages};
+    rd.onerror = () => toast('อ่านไฟล์ไม่ได้');
+    rd.readAsText(f);
 }
-// One-click PDF named NAME_DD_DD_MM_NO.pdf
-function downloadPDF(btn){
-  var d=clone(S.draft),name=fileBase(d)+'.pdf',old=btn.textContent;
-  btn.disabled=true;btn.textContent='Making PDF…';
-  var get=function(u){return fetch(u).then(function(r){return r.ok?r.arrayBuffer():null}).catch(function(){return null})};
-  Promise.all([get(BAND_URL),get(WM_URL)]).then(function(bufs){
-    var r=buildPdf(d,company(),bufs[0]?new Uint8Array(bufs[0]):null,bufs[1]?new Uint8Array(bufs[1]):null);
-    var url=URL.createObjectURL(new Blob([r.bytes],{type:'application/pdf'}));
-    var lk=document.createElement('a');lk.href=url;lk.download=name;
-    document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},2000);
-    toast(r.bad?'Downloaded '+name+'. '+r.bad+' character(s) such as Thai letters cannot be shown in the PDF and appear as ?':'Downloaded '+name,r.bad?7000:2600);
-  }).catch(function(e){toast('PDF failed: '+(e&&e.message||'try Print instead'),6000)})
-  .then(function(){btn.disabled=false;btn.textContent=old});
+
+/* ============ ข้อความแจ้งเตือน ============ */
+let toastTimer = null;
+function toast(msg, actLabel, actFn) {
+    $('toast-msg').textContent = msg;
+    const b = $('toast-act');
+    if (actLabel) { b.hidden = false; b.textContent = actLabel; b.onclick = () => { $('toast').hidden = true; actFn(); }; }
+    else { b.hidden = true; b.onclick = null; }
+    $('toast').hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, actLabel ? 8000 : 3500);
 }
-function refreshPairs(key){$('#'+key).innerHTML=pairsHTML(key)}
 
-document.addEventListener('click',function(e){
-  var g=e.target.closest('[data-go]');if(g){go(g.getAttribute('data-go'));return}
-  var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
-  var a=b.getAttribute('data-act'),i=+b.getAttribute('data-i'),id=b.getAttribute('data-id'),key=b.getAttribute('data-key');
-  if(a==='new'){guard(function(){return ensureReady().then(function(){openDraft(newDraft(),null)})})}
-  else if(a==='open'){guard(function(){return ensureReady().then(function(){return api('GET','/api/itineraries/'+id)}).then(function(d){openDraft(d,id)})})}
-  else if(a==='dup'){guard(function(){return ensureReady().then(function(){return api('GET','/api/itineraries/'+id)}).then(function(d){delete d._rev;d.number=nextNumber();d.issueDate=today();d.guestName='';d.title='';d.guests=[];openDraft(d,null)})})}
-  else if(a==='back'){go('list')}
-  else if(a==='addDay'){S.draft.days.push({text:''});$('#days').innerHTML=daysHTML();touch()}
-  else if(a==='rmDay'){if(S.draft.days[i].text.trim()&&!window.confirm('Remove Day '+(i+1)+' and its text?'))return;S.draft.days.splice(i,1);$('#days').innerHTML=daysHTML();touch()}
-  else if(a==='genDays'){genDays()}
-  else if(a==='addTour'){
-    var sel=$('[data-tour="'+i+'"]');var t=S.tours.filter(function(x){return x.id===(sel&&sel.value)})[0];
-    var tm=$('[data-pick="'+i+'"]');var pick=pickLine(tm&&tm.value);
-    if(!t){toast('Choose a tour first');return}
-    var tourTxt=t.name+(t.note?' '+t.note:'');
-    var add=[pick?pick+' | '+tourTxt:tourTxt];
-    var cur=S.draft.days[i].text.replace(/\s+$/,'');
-    S.draft.days[i].text=(cur?cur+'\n':'')+add.join('\n');$('#days').innerHTML=daysHTML();touch();
-  }
-  else if(a==='addGuest'){S.draft.guests.push({n:'',p:''});$('#guests').innerHTML=guestsHTML();guestHint();touch();var gi=document.querySelectorAll('[data-guest][data-k="n"]');if(gi.length)gi[gi.length-1].focus()}
-  else if(a==='rmGuest'){S.draft.guests.splice(i,1);$('#guests').innerHTML=guestsHTML();guestHint();touch()}
-  else if(a==='addPair'){S.draft[key].push({k:'',v:''});S.dirty=true;refreshPairs(key)}
-  else if(a==='rmPair'){S.draft[key].splice(i,1);refreshPairs(key);touch()}
-  else if(a==='save'){guard(function(){
-    var d=clone(S.draft);d.number=+d.number||d.number;d.adults=+d.adults||0;d.child=+d.child||0;d.infant=+d.infant||0;d.guests=memberList(d);
-    var req=S.editId?api('PUT','/api/itineraries/'+S.editId,d):api('POST','/api/itineraries',d).then(function(r){S.editId=r.id;return r});
-    return req.then(function(r){
-      S.draft._rev=r._rev;S.dirty=false;
-      toast('Saved to Notion');
-      var h=$('.head h1');if(h)h.textContent='Edit itinerary '+fileBase(d);
-      var del=$('[data-act="delete"]');if(!del){var act=$('.head .actions'),pr=$('[data-act="save"]');var nb=document.createElement('button');nb.className='btn danger';nb.setAttribute('data-act','delete');nb.textContent='Delete itinerary';act.insertBefore(nb,pr)}
-      loadKind('itineraries');
+/* ============ ชื่อบริษัทพอดีหัวกระดาษ / ชื่อไฟล์ PDF ============ */
+const companyInput = $('company-name-input');
+function fitCompanyName() {
+    companyInput.style.fontSize = '';
+    let size = parseFloat(getComputedStyle(companyInput).fontSize);
+    while (companyInput.scrollWidth > companyInput.clientWidth && size > 10) {
+        size -= 0.5;
+        companyInput.style.fontSize = size + 'px';
+    }
+}
+/* ชื่อไฟล์ตอน Save as PDF: GP_000_MM_Customer Name_Cost Summary */
+function updateFileTitle() {
+    const clean = (s) => s.replace(/[\\/:*?"<>|]/g, '').trim();
+    const ref = clean($('ref-input').value).replace(/[-\s]+/g, '_');
+    const customer = clean($('customer-name-input').value);
+    // เลขเดือน = เดือนที่ลูกค้าเดินทาง (ช่อง Travel Date วันเริ่มต้น) ไม่ใช่เดือนที่ออกใบ
+    const tm = parseInt(document.querySelectorAll('.date-box')[1].value, 10);
+    const mm = (tm >= 1 && tm <= 12) ? String(tm).padStart(2, '0') : '00';
+    document.title = [ref, mm, customer, 'Cost Summary'].filter(Boolean).join('_');
+}
+function printDoc() { saveNow(); updateFileTitle(); window.print(); }
+
+/* ============ จำนวนคืน / วัน ============ */
+function calcNights() {
+    const el = $('nights');
+    el.textContent = '';
+    const [d1, m1, d2, m2, y] = [...document.querySelectorAll('.date-box')].map((b) => parseInt(b.value, 10));
+    if ([d1, m1, d2, m2, y].some((n) => !Number.isFinite(n)) || y < 1000) return;
+    const ye = y + (m2 < m1 ? 1 : 0);   // ข้ามปี เช่น 28/12 - 02/01
+    const s = new Date(Date.UTC(y, m1 - 1, d1)), e = new Date(Date.UTC(ye, m2 - 1, d2));
+    if (s.getUTCDate() !== d1 || s.getUTCMonth() !== m1 - 1 || e.getUTCDate() !== d2 || e.getUTCMonth() !== m2 - 1) return;
+    const n = Math.round((e - s) / 86400000);
+    if (n < 0 || n > 120) return;
+    el.textContent = n + 'N ' + (n + 1) + 'D';
+}
+
+/* ============ รายชื่อหลัก (โรงแรม / สถานที่ ฯลฯ) ============ */
+const MASTER_LABEL = { 'sec-acc': 'โรงแรม', 'sec-tour': 'สถานที่ / ทัวร์', 'sec-trans': 'รถ / เดินทาง', 'sec-other': 'อื่น ๆ' };
+let master = { 'sec-acc': [], 'sec-tour': [], 'sec-trans': [], 'sec-other': [] };
+let mSec = 'sec-acc';
+const sortTh = (arr) => arr.slice().sort((a, b) => a.localeCompare(b, 'th'));
+
+function normMaster(o) {
+    const out = {};
+    SECTIONS.forEach((id) => {
+        const arr = Array.isArray(o && o[id]) ? o[id] : [];
+        const seen = new Set();
+        out[id] = [];
+        arr.forEach((it) => {
+            const n = String(it && it.n != null ? it.n : '').trim();
+            const k = n.toLowerCase();
+            if (!n || seen.has(k)) return;
+            seen.add(k);
+            out[id].push({ n, t: (Array.isArray(it.t) ? it.t : []).map((x) => String(x).trim()).filter(Boolean).slice(0, 30) });
+        });
     });
-  })}
-  else if(a==='delete'){
-    if(!S.delArmed){S.delArmed=true;b.textContent='Click again to confirm';setTimeout(function(){S.delArmed=false;if(b.isConnected)b.textContent='Delete itinerary'},4000)}
-    else guard(function(){return api('DELETE','/api/itineraries/'+S.editId).then(function(){toast('Deleted');S.draft=null;S.editId=null;S.loaded.itineraries=false;go('list',true)})})
-  }
-  else if(a==='pdf'){downloadPDF(b)}
-  else if(a==='print'){
-    // the browser proposes the document title as the PDF file name
-    var oldT=document.title;document.title=fileBase(S.draft);
-    var back=function(){document.title=oldT;window.removeEventListener('afterprint',back)};
-    window.addEventListener('afterprint',back);window.print();setTimeout(back,60000);
-  }
-  else if(a==='download'){
-    var d2=clone(S.draft);
-    Promise.all([bandData(),assetData(WM_URL)]).then(function(a){
-      var blob=new Blob([fullHTML(d2,company(),a[0],a[1])],{type:'text/html'});
-      var url=URL.createObjectURL(blob);var lk=document.createElement('a');
-      lk.href=url;lk.download=fileBase(d2)+'.html';
-      document.body.appendChild(lk);lk.click();lk.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+    return out;
+}
+function readMaster() {
+    let raw = null;
+    try { raw = localStorage.getItem(KEY_MASTER); } catch (e) { return normMaster({}); }
+    if (!raw) return normMaster({});
+    try { return normMaster(JSON.parse(raw)); }
+    catch (e) { try { localStorage.setItem(KEY_MASTER + '.corrupt', raw); } catch (_) {} return normMaster({}); }
+}
+function writeMaster(m) { try { localStorage.setItem(KEY_MASTER, JSON.stringify(m)); return true; } catch (e) { return false; } }
+function mutateMaster(fn) { const m = readMaster(); fn(m); const ok = writeMaster(m); master = m; return ok; }
+function addMasterItem(sec, name) {
+    name = String(name || '').trim();
+    if (!name) return false;
+    let added = false;
+    mutateMaster((m) => {
+        if (!m[sec].some((i) => i.n.toLowerCase() === name.toLowerCase())) { m[sec].push({ n: name, t: [] }); added = true; }
     });
-  }
-  else if(a==='copy'){
-    var txt=textExport(S.draft,company());
-    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast('Copied. Paste it into your chat.')}).catch(function(){toast('Could not copy. Use Download instead.')});
-  }
-  else if(a==='libSave'){guard(function(){
-    var kind=S.view,L=LIBS[kind],data={};
-    L.fields.forEach(function(f){data[f[0]]=$('#lf-'+f[0]).value.trim()});
-    if(!data[L.fields[0][0]]){toast('Enter a name first');return}
-    var base='/api/lib/'+kind;
-    var req=S.libEdit?api('PUT',base+'/'+S.libEdit,data):api('POST',base,data);
-    return req.then(function(){
-      S.libEdit=null;L.fields.forEach(function(f){var el=$('#lf-'+f[0]);if(f[2]!=='select')el.value=''});
-      $('#libCancel').hidden=true;$('#lib-form-title').textContent=L.add;toast('Saved to Notion');
-      return loadKind(kind);
+    return added;
+}
+/* จำ "ประเภท" ที่เคยใช้กับแต่ละชื่อ (เฉพาะชื่อที่อยู่ในรายการ) ไว้แนะนำครั้งหน้า */
+function rememberTypes() {
+    const d = collect();
+    const m = readMaster();
+    let changed = false;
+    SECTIONS.forEach((sec) => (d.sections[sec] || []).forEach((r) => {
+        const n = (r.d || '').trim().toLowerCase(), t = (r.t || '').trim();
+        if (!n || !t) return;
+        const it = m[sec].find((i) => i.n.toLowerCase() === n);
+        if (it && !it.t.some((x) => x.toLowerCase() === t.toLowerCase())) { it.t.push(t); if (it.t.length > 30) it.t.shift(); changed = true; }
+    }));
+    if (changed) { writeMaster(m); master = m; }
+}
+
+/* ---- หน้าต่างจัดการรายชื่อ ---- */
+function openMaster() { master = readMaster(); renderMaster(); $('master-modal').hidden = false; toggleSidebar(false); setTimeout(() => $('master-new').focus(), 50); }
+function closeMaster() { $('master-modal').hidden = true; }
+function renderMaster() {
+    const tabs = $('master-tabs');
+    tabs.textContent = '';
+    SECTIONS.forEach((id) => {
+        const b = document.createElement('button');
+        b.className = 'tab' + (id === mSec ? ' active' : '');
+        b.textContent = MASTER_LABEL[id] + ' (' + master[id].length + ')';
+        b.onclick = () => { mSec = id; renderMaster(); $('master-new').focus(); };
+        tabs.appendChild(b);
     });
-  })}
-  else if(a==='libEdit'){
-    var kind2=S.view,it2=S[kind2].filter(function(x){return x.id===id})[0];if(!it2)return;
-    S.libEdit=id;LIBS[kind2].fields.forEach(function(f){$('#lf-'+f[0]).value=it2[f[0]]||''});
-    $('#libCancel').hidden=false;$('#lib-form-title').textContent='Edit item';$('#lf-'+LIBS[kind2].fields[0][0]).focus();
-  }
-  else if(a==='libCancel'){
-    var L2=LIBS[S.view];S.libEdit=null;L2.fields.forEach(function(f){if(f[2]!=='select')$('#lf-'+f[0]).value=''});$('#libCancel').hidden=true;$('#lib-form-title').textContent=L2.add;
-  }
-  else if(a==='libDel'){
-    if(b.getAttribute('data-armed')!=='1'){b.setAttribute('data-armed','1');b.textContent='Confirm';setTimeout(function(){if(b.isConnected){b.removeAttribute('data-armed');b.textContent='Delete'}},4000)}
-    else guard(function(){var kind=S.view;return api('DELETE','/api/lib/'+kind+'/'+id).then(function(){toast('Deleted');return loadKind(kind)})});
-  }
+    const box = $('master-list');
+    box.textContent = '';
+    const items = master[mSec].slice().sort((a, b) => a.n.localeCompare(b.n, 'th'));
+    if (!items.length) {
+        const e = document.createElement('div'); e.className = 'list-empty'; e.textContent = 'ยังไม่มีรายชื่อในหมวดนี้'; box.appendChild(e);
+    }
+    items.forEach((it) => {
+        const row = document.createElement('div'); row.className = 'm-row';
+        const inp = document.createElement('input'); inp.type = 'text'; inp.value = it.n; inp.autocomplete = 'off';
+        inp.addEventListener('change', () => {
+            const nn = inp.value.trim();
+            if (!nn) { inp.value = it.n; return; }
+            if (nn.toLowerCase() !== it.n.toLowerCase() && master[mSec].some((x) => x.n.toLowerCase() === nn.toLowerCase())) { toast('มีชื่อนี้อยู่แล้ว'); inp.value = it.n; return; }
+            const old = it.n;
+            mutateMaster((m) => { const x = m[mSec].find((i) => i.n === old); if (x) x.n = nn; });
+            renderMaster();
+        });
+        const ty = document.createElement('span'); ty.className = 'm-types'; ty.title = it.t.join(', ');
+        ty.textContent = it.t.length ? 'ประเภท: ' + it.t.join(', ') : '';
+        const del = document.createElement('button'); del.className = 'm-del'; del.textContent = '×'; del.title = 'ลบออกจากรายการ';
+        del.addEventListener('click', () => {
+            const backup = JSON.parse(JSON.stringify(it)), sec = mSec;
+            mutateMaster((m) => { m[sec] = m[sec].filter((i) => i.n !== it.n); });
+            renderMaster();
+            toast('ลบ “' + it.n + '” แล้ว', 'ย้อนกลับ', () => { mutateMaster((m) => { if (!m[sec].some((i) => i.n.toLowerCase() === backup.n.toLowerCase())) m[sec].push(backup); }); renderMaster(); });
+        });
+        row.append(inp, ty, del);
+        box.appendChild(row);
+    });
+}
+function masterAddOne() {
+    const inp = $('master-new');
+    const name = inp.value.trim();
+    if (!name) return;
+    const added = addMasterItem(mSec, name);
+    inp.value = '';
+    renderMaster();
+    toast(added ? 'เพิ่ม “' + name + '” แล้ว' : 'มีชื่อนี้อยู่แล้ว');
+    inp.focus();
+}
+function masterAddBulk() {
+    const lines = $('master-bulk').value.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+    let n = 0;
+    lines.forEach((l) => { if (addMasterItem(mSec, l)) n++; });
+    $('master-bulk').value = '';
+    renderMaster();
+    toast('เพิ่ม ' + n + ' รายการ' + (lines.length - n ? ' (ซ้ำ ' + (lines.length - n) + ')' : ''));
+}
+
+/* ============ รายการแนะนำขณะพิมพ์ (autocomplete) ============ */
+const ac = { el: null, input: null, items: [], idx: -1 };
+function acEnsure() {
+    if (ac.el) return;
+    ac.el = document.createElement('div');
+    ac.el.className = 'ac-pop no-print';
+    ac.el.hidden = true;
+    ac.el.addEventListener('mousedown', (e) => {
+        e.preventDefault();   // ไม่ให้ช่องกรอกเสียโฟกัส
+        const li = e.target.closest('[data-i]');
+        if (li) acPick(+li.dataset.i);
+    });
+    document.body.appendChild(ac.el);
+}
+function acOptions(input) {
+    const kind = input.dataset.ac, sec = input.closest('tbody').id, raw = input.value.trim(), q = raw.toLowerCase();
+    if (kind === 'name') {
+        const all = master[sec] || [];
+        const exact = all.some((i) => i.n.toLowerCase() === q);
+        const list = (exact || !q) ? all : all.filter((i) => i.n.toLowerCase().includes(q));
+        const items = sortTh(list.map((i) => i.n)).slice(0, 60).map((n) => ({ label: n, val: n }));
+        if (q && !exact) items.push({ label: '+ เพิ่ม “' + raw + '” เข้ารายการ', val: raw, add: true });
+        if (!items.length) items.push({ label: 'ยังไม่มีรายชื่อ พิมพ์ชื่อแล้วเลือก “+ เพิ่ม”', hint: true });
+        return items;
+    }
+    const nm = input.closest('tr').querySelector('[data-ac="name"]').value.trim().toLowerCase();
+    const item = (master[sec] || []).find((i) => i.n.toLowerCase() === nm);
+    let types = item ? item.t : [...new Set((master[sec] || []).flatMap((i) => i.t))];
+    if (q && !types.some((t) => t.toLowerCase() === q)) types = types.filter((t) => t.toLowerCase().includes(q));
+    return types.slice(0, 30).map((t) => ({ label: t, val: t }));
+}
+function acShow(input) {
+    acEnsure();
+    const items = acOptions(input);
+    if (!items.length) { acHide(); return; }
+    ac.input = input; ac.items = items; ac.idx = -1;
+    ac.el.textContent = '';
+    items.forEach((it, i) => {
+        const d = document.createElement('div');
+        d.className = 'ac-item' + (it.add ? ' add' : '') + (it.hint ? ' hint' : '');
+        d.dataset.i = i; d.textContent = it.label;
+        ac.el.appendChild(d);
+    });
+    const r = input.getBoundingClientRect();
+    const w = Math.max(r.width, 230);
+    ac.el.style.minWidth = w + 'px';
+    ac.el.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - w - 12)) + 'px';
+    ac.el.style.top = (r.bottom + window.scrollY + 2) + 'px';
+    ac.el.hidden = false;
+}
+function acHide() { if (ac.el) ac.el.hidden = true; ac.input = null; }
+function acMark() {
+    [...ac.el.children].forEach((c, i) => {
+        c.classList.toggle('sel', i === ac.idx);
+        if (i === ac.idx) c.scrollIntoView({ block: 'nearest' });
+    });
+}
+function acPick(i) {
+    const it = ac.items[i], input = ac.input;
+    if (!it || it.hint || !input) return;
+    const kind = input.dataset.ac, sec = input.closest('tbody').id, tr = input.closest('tr');
+    input.value = it.val;
+    if (it.add) { addMasterItem(sec, it.val); toast('เพิ่ม “' + it.val + '” เข้ารายการแล้ว'); }
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    acHide();
+    if (kind === 'type') rememberTypes();
+    (kind === 'name' ? (tr.querySelector('.row-type') || tr.querySelector('.auto-calc')) : tr.querySelector('.auto-calc')).focus();
+}
+document.addEventListener('focusin', (e) => { if (e.target.matches && e.target.matches('input[data-ac]')) acShow(e.target); else acHide(); });
+document.addEventListener('focusout', (e) => { if (e.target.matches && e.target.matches('input[data-ac]')) acHide(); });
+document.addEventListener('input', (e) => { if (e.target.matches && e.target.matches('input[data-ac]')) acShow(e.target); });
+document.addEventListener('change', (e) => { if (e.target.classList && e.target.classList.contains('row-type')) rememberTypes(); });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !$('master-modal').hidden) { closeMaster(); return; }
+    const t = e.target;
+    if (!(t.matches && t.matches('input[data-ac]'))) return;
+    if (e.key === 'ArrowDown' && (!ac.el || ac.el.hidden)) { acShow(t); e.preventDefault(); return; }
+    if (!ac.el || ac.el.hidden || ac.input !== t) return;
+    if (e.key === 'ArrowDown') { ac.idx = Math.min(ac.idx + 1, ac.items.length - 1); acMark(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { ac.idx = Math.max(ac.idx - 1, 0); acMark(); e.preventDefault(); }
+    else if (e.key === 'Enter' && ac.idx >= 0) { e.preventDefault(); acPick(ac.idx); }
+    else if (e.key === 'Escape') { acHide(); }
+});
+window.addEventListener('resize', acHide);
+
+/* ============ ผูกเหตุการณ์ ============ */
+companyInput.addEventListener('input', () => {
+    $('footer-company-name').textContent = companyInput.value + ' - Tour Cost Summary';
+    fitCompanyName();
+});
+['ref-input', 'customer-name-input', 'current-date'].forEach((id) => $(id).addEventListener('input', updateFileTitle));
+$('ref-input').addEventListener('input', checkRefDup);
+window.addEventListener('error', (e) => { toast('เกิดข้อผิดพลาด: ' + (e.message || 'ไม่ทราบสาเหตุ') + ' (ข้อมูลที่บันทึกไว้แล้วไม่เสียหาย ลองรีเฟรชหน้า)'); });
+window.addEventListener('unhandledrejection', () => { toast('เกิดข้อผิดพลาดบางอย่าง ข้อมูลที่บันทึกไว้แล้วไม่เสียหาย'); });
+
+const dateBoxes = [...document.querySelectorAll('.date-box')];
+dateBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+        box.value = box.value.replace(/\D/g, '');
+        calcNights();
+        updateFileTitle();
+        if (box.value.length >= box.maxLength && dateBoxes[i + 1]) { dateBoxes[i + 1].focus(); dateBoxes[i + 1].select(); }
+    });
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && box.value === '' && dateBoxes[i - 1]) dateBoxes[i - 1].focus();
+    });
+    box.addEventListener('focus', () => box.select());
 });
 
-document.addEventListener('input',function(e){
-  var t=e.target;
-  if(t.id==='q'){S.q=t.value;VIEWS.list.refresh();return}
-  if(S.view!=='editor'||!S.draft)return;
-  if(t.hasAttribute('data-f')){S.draft[t.getAttribute('data-f')]=t.value}
-  else if(t.hasAttribute('data-day')){S.draft.days[+t.getAttribute('data-day')].text=t.value}
-  else if(t.hasAttribute('data-guest')){S.draft.guests[+t.getAttribute('data-guest')][t.getAttribute('data-k')]=t.value}
-  else if(t.hasAttribute('data-pair')){S.draft[t.getAttribute('data-pair')][+t.getAttribute('data-i')][t.getAttribute('data-k')]=t.value}
-  else return;
-  S.dirty=true;
-  cancelAnimationFrame(S.raf);S.raf=requestAnimationFrame(function(){VIEWS.editor.preview()});
+/* ทุกการแก้ไขในแผ่นเอกสาร → ตั้งเวลาบันทึก */
+$('sheet').addEventListener('input', scheduleSave);
+
+window.addEventListener('beforeprint', () => { updateFileTitle(); fitCompanyName(); });
+window.addEventListener('resize', fitCompanyName);
+window.addEventListener('load', fitCompanyName);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCompanyName);
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); });
+window.addEventListener('pagehide', saveNow);
+/* แท็บอื่นแก้ข้อมูล → อัปเดตรายการ */
+window.addEventListener('storage', (e) => {
+    if (e.key === KEY_DOCS) {
+        docs = readStore();
+        const cur = docs[curId];
+        if (cur && !dirty && (cur.updatedAt || 0) > loadedAt) { populate(cur); toast('อัปเดตเอกสารนี้ตามที่แก้จากอีกหน้าต่างแล้ว'); }
+        else renderList();
+    }
+    if (e.key === KEY_MASTER) { master = readMaster(); }
 });
-document.addEventListener('change',function(e){
-  var t=e.target;
-  if(S.view==='editor'&&S.draft&&(t.getAttribute('data-f')==='arrival'||t.getAttribute('data-f')==='departure')){genDays(true);return}
-  if(t.hasAttribute('data-snip')){
-    var s=S.snippets.filter(function(x){return x.id===t.value})[0];if(!s)return;
-    var f=t.getAttribute('data-snip');
-    if(S.draft[f]&&S.draft[f].trim()&&S.draft[f]!==s.body&&!window.confirm('Replace the current text with this standard text?')){t.value='';return}
-    S.draft[f]=s.body||'';
-    var ta=$('[data-f="'+f+'"]');if(ta)ta.value=S.draft[f];t.value='';touch();
-  }
-});
-window.addEventListener('beforeunload',function(e){if(S.view==='editor'&&S.dirty){e.preventDefault();e.returnValue=''}});
-window.addEventListener('hashchange',function(){
-  var h=location.hash.slice(1);if(VIEWS[h]&&h!=='editor'&&h!==S.view){S.view=h;render()}
-});
-document.addEventListener('visibilitychange',function(){
-  if(document.visibilityState==='visible'&&S.view!=='editor'){if(S.view==='list')loadKind('itineraries');else if(LIBS[S.view])loadKind(S.view)}
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveNow(); toast('บันทึกแล้ว'); }
 });
 
-/* ---------- start ---------- */
-(function(){
-  var h=location.hash.slice(1);if(VIEWS[h]&&h!=='editor')S.view=h;
-  function isDark(){var t=document.documentElement.getAttribute('data-theme');return t?t==='dark':window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches}
-  function paintTheme(){var b=$('#themeBtn');if(b){var d=isDark();b.textContent=d?'\u2600 Light mode':'\u263E Dark mode';b.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode')}}
-  $('#themeBtn').addEventListener('click',function(){
-    var next=isDark()?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    try{localStorage.setItem('theme',next)}catch(e){}
-    paintTheme();
-  });
-  paintTheme();
-  $('#ver').textContent=VERSION;
-  render();
-  fetch('/company.json').then(function(r){return r.ok?r.json():null}).then(function(c){
-    if(c){S.company=c;if(S.view==='editor')VIEWS.editor.preview()}
-  }).catch(function(){});
-  loadAll();
-})();
+/* ============ โหมดกลางคืน ============ */
+const KEY_THEME = 'tcs:v1:theme';
+function currentTheme() { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; }
+function applyTheme(t) {
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.content = t === 'dark' ? '#171b21' : '#C98B15';
+    const b = $('theme-btn');
+    if (b) b.textContent = t === 'dark' ? '☀ Light' : '🌙 Dark';
+}
+function toggleTheme() {
+    const t = currentTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(t);
+    try { localStorage.setItem(KEY_THEME, t); } catch (e) {}
+}
+if (window.matchMedia) {
+    const mq = matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', (e) => {
+        let saved = null;
+        try { saved = localStorage.getItem(KEY_THEME); } catch (_) {}
+        if (!saved) applyTheme(e.matches ? 'dark' : 'light');   // ยังไม่เคยเลือกเอง → ตามค่าของ Windows
+    });
+}
+
+/* ============ เริ่มต้น ============ */
+(function init() {
+    applyTheme(currentTheme());
+    docs = readStore();
+    master = readMaster();
+    $('app-version').textContent = 'Cost Summary v' + APP_VERSION;
+    $('storage-banner').hidden = storageOk;
+    let id = null;
+    try { id = localStorage.getItem(KEY_CUR); } catch (e) {}
+    if (id && docs[id]) populate(docs[id]);
+    else if (Object.keys(docs).length) populate(sortedDocs()[0]);
+    else { const d = blankDoc(); mutate((s) => { s[d.id] = d; }); populate(d); }
+    setStatus(storageOk ? 'พร้อมใช้งาน · บันทึกอัตโนมัติ' : 'บันทึกลงเครื่องไม่ได้!', !storageOk);
+
+    // ติดตั้งเป็นแอป/ใช้ออฟไลน์ (ทำงานเมื่อเปิดผ่าน https หรือ localhost เท่านั้น)
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
 })();
 </script>
 </body>
